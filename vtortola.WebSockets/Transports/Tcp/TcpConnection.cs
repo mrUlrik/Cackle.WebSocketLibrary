@@ -3,6 +3,7 @@
 	License: https://opensource.org/licenses/MIT
 */
 using System;
+using System.Net;
 using System.Net.Sockets;
 using vtortola.WebSockets.Transports.Sockets;
 
@@ -59,7 +60,7 @@ namespace vtortola.WebSockets.Transports.Tcp
 #endif
 
         /// <inheritdoc />
-        public TcpConnection(Socket socket) : base(socket)
+        public TcpConnection(Socket socket, EndPoint localEndPoint) : base(socket, localEndPoint)
         {
             this.socket = socket;
         }

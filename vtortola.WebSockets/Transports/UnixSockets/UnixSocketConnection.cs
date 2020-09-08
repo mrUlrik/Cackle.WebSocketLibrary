@@ -3,6 +3,7 @@
 	License: https://opensource.org/licenses/MIT
 */
 using System;
+using System.Net;
 using System.Net.Sockets;
 using vtortola.WebSockets.Transports.Sockets;
 
@@ -42,7 +43,7 @@ namespace vtortola.WebSockets.Transports.UnixSockets
         }
 
         /// <inheritdoc />
-        public UnixSocketConnection(Socket socket) : base(socket)
+        public UnixSocketConnection(Socket socket, EndPoint localEndPoint) : base(socket, localEndPoint)
         {
             if (socket == null) throw new ArgumentNullException(nameof(socket));
 

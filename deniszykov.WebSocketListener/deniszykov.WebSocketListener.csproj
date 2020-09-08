@@ -7,7 +7,7 @@
 https://github.com/deniszykov/WebSocketListener</Description>
 		<Company>deniszykov</Company>
 		<Product>deniszykov.WebSocketListener</Product>
-		<Version>4.2.9</Version>
+		<Version>4.2.10</Version>
 		<Authors>Valeriano Tortola, Denis Zykov</Authors>
 		<PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/deniszykov/WebSocketListener</PackageProjectUrl>
@@ -16,7 +16,11 @@ https://github.com/deniszykov/WebSocketListener</Description>
 		<PackageTags>websockets HTML5 realtime streaming sockets server client async asynchronous</PackageTags>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\WebSocketListener.snk</AssemblyOriginatorKeyFile>		
-		<PackageReleaseNotes>v.4.2.9
+		<PackageReleaseNotes>v.4.2.10
+fixed crash while debug logging Unix Domain Socket connection in `AcceptSocketAsConnection` method.
+added additional checks for errord Socket.RemoteEndPoint and Socket.LocalEndPoint, now they produces 'WebSocketHttpRequest.NoAddress'
+
+v.4.2.9
 reverted gzip per-message compression back to original code
 added WSClient gzip per-message compression negotiation
 

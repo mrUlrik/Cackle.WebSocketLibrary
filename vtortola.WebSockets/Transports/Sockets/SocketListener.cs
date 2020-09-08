@@ -141,10 +141,13 @@ namespace vtortola.WebSockets.Transports.Sockets
             }
 
             var socket = acceptTask.Result;
-            if (this.log.IsDebugEnabled)
-                this.log.Debug($"New socket accepted. Remote address: '{socket.RemoteEndPoint}', Local address: {socket.LocalEndPoint}.");
-
-            try { return this.CreateConnection(socket); }
+            try
+            {
+                var connection = this.CreateConnection(socket, acceptEndPoint); 
+                if (this.log.IsDebugEnabled)
+                    this.log.Debug($"New socket accepted. Remote address: '{connection.RemoteEndPoint?.ToString() ?? "<null>"}', Local address: '{connection.LocalEndPoint?.ToString() ?? "<null>"}'.");
+                return connection;
+            }
             catch
             {
                 SafeEnd.Dispose(socket, this.log);
@@ -208,7 +211,7 @@ namespace vtortola.WebSockets.Transports.Sockets
             }
         }
 
-        protected abstract NetworkConnection CreateConnection(Socket socket);
+        protected abstract NetworkConnection CreateConnection(Socket socket, EndPoint localEndPoint);
 
         private void ThrowIfDisposed()
         {

@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using vtortola.WebSockets;
 using vtortola.WebSockets.Tools;
+using vtortola.WebSockets.Transports.UnixSockets;
 
 #pragma warning disable 420
 
@@ -19,7 +20,6 @@ namespace vtortola.WebSockets.Transports.Sockets
     internal class SocketConnection : NetworkConnection
     {
         private static readonly byte[] JunkBytes = new byte[4 * 1024];
-        public static readonly EndPoint BrokenEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
         // event come in pair to prevent overlapping during 'Completed' event
         private const int EVENT_ACTIVE_RECEIVE = 0;
@@ -45,7 +45,7 @@ namespace vtortola.WebSockets.Transports.Sockets
 
         public bool IsClosed => this.closeState >= STATE_CLOSING;
 
-        public SocketConnection(Socket socket)
+        public SocketConnection(Socket socket, EndPoint localEndPoint)
         {
 #pragma warning disable 168 // unused local variable
             if (socket == null) throw new ArgumentNullException(nameof(socket));
@@ -58,7 +58,7 @@ namespace vtortola.WebSockets.Transports.Sockets
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine($"An error occurred while trying to get '{nameof(socket.LocalEndPoint)}' property of established connection." + getLocalEndPointError.Unwrap());
 #endif
-                this.LocalEndPoint = BrokenEndPoint;
+                this.LocalEndPoint = localEndPoint;
             }
             try { this.RemoteEndPoint = socket.RemoteEndPoint; }
             catch (ArgumentException getRemoteEndPointError) // Mono B_ug he AddressFamily InterNetworkV6 is not valid for the System.Net.IPEndPoint end point, use InterNetwork instead.
@@ -66,7 +66,14 @@ namespace vtortola.WebSockets.Transports.Sockets
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine($"An error occurred while trying to get '{nameof(socket.RemoteEndPoint)}' property of established connection." + getRemoteEndPointError.Unwrap());
 #endif
-                this.RemoteEndPoint = BrokenEndPoint;
+                if (UnixSocketTransport.IsUnixEndPoint(localEndPoint))
+                {
+                    this.RemoteEndPoint = localEndPoint;
+                }
+                else
+                {
+                    this.RemoteEndPoint = null;
+                }
             }
 
             this.socket = socket;

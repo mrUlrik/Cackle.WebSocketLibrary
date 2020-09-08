@@ -169,8 +169,8 @@ namespace vtortola.WebSockets
                 connection = await transport.ConnectAsync(requestUri, this.options, cancellation).ConfigureAwait(false);
 
                 handshake.Request.IsSecure = transport.ShouldUseSsl(requestUri);
-                handshake.Request.LocalEndPoint = connection.LocalEndPoint;
-                handshake.Request.RemoteEndPoint = connection.RemoteEndPoint;
+                handshake.Request.LocalEndPoint = connection.LocalEndPoint ?? WebSocketHttpRequest.NoAddress;
+                handshake.Request.RemoteEndPoint = connection.RemoteEndPoint ?? WebSocketHttpRequest.NoAddress;
 
                 webSocket = await this.NegotiateRequestAsync(handshake, connection, cancellation).ConfigureAwait(false);
                 return webSocket;

@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using vtortola.WebSockets.Async;
+using vtortola.WebSockets.Transports.UnixSockets;
 
 namespace vtortola.WebSockets.Transports.Sockets
 {
@@ -71,7 +72,20 @@ namespace vtortola.WebSockets.Transports.Sockets
                     throw new WebSocketException($"Failed to open socket to '{address}' due error '{socketAsyncEventArgs.SocketError}'.",
                         new SocketException((int)socketAsyncEventArgs.SocketError));
 
-                var connection = new SocketConnection(socket);
+                var localEndPoint = default(EndPoint);
+                try
+                {
+                    localEndPoint = socket.LocalEndPoint;
+                }
+                catch
+                {
+                    if (UnixSocketTransport.IsUnixEndPoint(remoteEndPoint))
+                    {
+                        localEndPoint = remoteEndPoint;
+                    }
+                }
+
+                var connection = new SocketConnection(socket, localEndPoint);
                 socket = null;
                 return connection;
             }

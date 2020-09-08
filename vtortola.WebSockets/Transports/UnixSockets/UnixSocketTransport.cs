@@ -27,6 +27,7 @@ namespace vtortola.WebSockets.Transports.UnixSockets
 
         private static readonly Func<string, EndPoint> UnixEndPointConstructor;
         private static readonly Func<EndPoint, string> UnixEndPointGetFileName;
+        private static readonly TypeInfo UnixEndPointType;
 
 
         private static readonly string[] SupportedSchemes = { "unix" };
@@ -83,6 +84,7 @@ namespace vtortola.WebSockets.Transports.UnixSockets
                 UnixEndPointConstructor = path => (EndPoint)unixEndPointCtr.Invoke(new object[] { path });
                 UnixEndPointGetFileName = endPoint => (string)fileNameGet.Invoke(endPoint, default(object[]));
             }
+            UnixEndPointType = unixEndPointType;
         }
 
         /// <inheritdoc />
@@ -134,6 +136,15 @@ namespace vtortola.WebSockets.Transports.UnixSockets
             if (unixEndPoint == null) throw new ArgumentNullException(nameof(unixEndPoint));
 
             return UnixEndPointGetFileName.Invoke(unixEndPoint);
+        }
+
+        internal static bool IsUnixEndPoint(EndPoint endPoint)
+        {
+            if (endPoint == null)
+            {
+                return false;
+            }
+            return UnixEndPointType.IsAssignableFrom(endPoint.GetType().GetTypeInfo());
         }
 
         private async Task TryAndRemoveUnixSocketFileAsync(Uri address, WebSocketListenerOptions options)

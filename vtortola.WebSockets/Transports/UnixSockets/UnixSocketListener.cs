@@ -24,7 +24,7 @@ namespace vtortola.WebSockets.Transports.UnixSockets
         }
 
         /// <inheritdoc />
-        protected override NetworkConnection CreateConnection(Socket socket)
+        protected override NetworkConnection CreateConnection(Socket socket, EndPoint localEndPoint)
         {
             if (this.transport.LingerState != null)
                 socket.LingerState = this.transport.LingerState;
@@ -35,7 +35,7 @@ namespace vtortola.WebSockets.Transports.UnixSockets
 #if !NETSTANDARD && !UAP
             socket.UseOnlyOverlappedIO = this.transport.IsAsync;
 #endif
-            return new UnixSocketConnection(socket);
+            return new UnixSocketConnection(socket, localEndPoint);
         }
 
         /// <inheritdoc />

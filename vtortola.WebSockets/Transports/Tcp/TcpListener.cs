@@ -27,7 +27,7 @@ namespace vtortola.WebSockets.Transports.Tcp
         }
 
         /// <inheritdoc />
-        protected override NetworkConnection CreateConnection(Socket socket)
+        protected override NetworkConnection CreateConnection(Socket socket, EndPoint localEndPoint)
         {
             if (this.transport.LingerState != null)
                 socket.LingerState = this.transport.LingerState;
@@ -41,7 +41,7 @@ namespace vtortola.WebSockets.Transports.Tcp
                 socket.SetIPProtectionLevel(this.transport.IpProtectionLevel);
             socket.UseOnlyOverlappedIO = this.transport.IsAsync;
 #endif
-            return new TcpConnection(socket);
+            return new TcpConnection(socket, localEndPoint);
         }
 
         /// <inheritdoc />
