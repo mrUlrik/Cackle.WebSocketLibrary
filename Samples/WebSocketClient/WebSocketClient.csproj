@@ -8,7 +8,7 @@
     <Compile Include="..\EchoServer\Log4NetLogger.cs" Link="Log4NetLogger.cs" />
   </ItemGroup>
   <ItemGroup>
-  <PackageReference Include="log4net" Version="2.0.5" />
+  <PackageReference Include="log4net" Version="2.0.12" />
 </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\vtortola.WebSockets.Deflate\vtortola.WebSockets.Deflate.csproj" />
