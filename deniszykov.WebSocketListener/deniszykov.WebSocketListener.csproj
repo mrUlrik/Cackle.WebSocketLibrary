@@ -16,7 +16,10 @@ https://github.com/deniszykov/WebSocketListener</Description>
 		<PackageTags>websockets HTML5 realtime streaming sockets server client async asynchronous</PackageTags>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\WebSocketListener.snk</AssemblyOriginatorKeyFile>		
-		<PackageReleaseNotes>v.4.2.10
+		<PackageReleaseNotes>v.4.2.11
+added close reply if remote party is requesting connection close.
+
+v.4.2.10
 fixed crash while debug logging Unix Domain Socket connection in `AcceptSocketAsConnection` method.
 added additional checks for errord Socket.RemoteEndPoint and Socket.LocalEndPoint, now they produces 'WebSocketHttpRequest.NoAddress'
 
