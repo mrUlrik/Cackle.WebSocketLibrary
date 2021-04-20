@@ -36,6 +36,7 @@ namespace vtortola.WebSockets.UnitTests
         {
             var options = new WebSocketListenerOptions()
             {
+                NegotiationTimeout = TimeSpan.FromSeconds(20),
                 Logger = new TestLogger(this.logger) { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached },
             };
             options.Standards.RegisterRfc6455();
@@ -62,6 +63,7 @@ namespace vtortola.WebSockets.UnitTests
             var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds)).Token;
             var options = new WebSocketListenerOptions
             {
+                NegotiationTimeout = TimeSpan.FromSeconds(20),
                 Logger = new TestLogger(this.logger) { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached }
             };
             options.Standards.RegisterRfc6455();
@@ -141,7 +143,8 @@ namespace vtortola.WebSockets.UnitTests
                 this.logger.Debug($"[TEST] Server: r={server.ReceivedMessages}, s={server.SentMessages}, e={server.Errors}. " +
                     $"Clients: r={messageSender.MessagesReceived}, s={messageSender.MessagesSent}, e={messageSender.Errors}.");
             }
-            await sendTask.ConfigureAwait(false);
+            var processedMessages = await sendTask.ConfigureAwait(false);
+            Assert.Equal(messages.Length, processedMessages);
 
             this.logger.Debug("[TEST] Stopping echo server.");
             await server.StopAsync().ConfigureAwait(false);
@@ -215,7 +218,8 @@ namespace vtortola.WebSockets.UnitTests
             if (cancellation.IsCancellationRequested)
                 throw new TimeoutException();
 
-            await sendTask.ConfigureAwait(false);
+            var processedMessages = await sendTask.ConfigureAwait(false);
+            Assert.Equal(messages.Length * maxClients, processedMessages);
 
             this.logger.Debug("[TEST] Stopping echo server.");
             await server.StopAsync().ConfigureAwait(false);

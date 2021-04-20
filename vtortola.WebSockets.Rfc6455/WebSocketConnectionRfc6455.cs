@@ -19,7 +19,7 @@ namespace vtortola.WebSockets.Rfc6455
         private const int CLOSE_STATE_DISPOSED = 2;
 
         //    readonly Byte[] _buffer;
-        private readonly ArraySegment<byte> headerBuffer, outPingBuffer, outPongBuffer, inPingBuffer, inPongBuffer, closeBuffer;
+        private readonly ArraySegment<byte> headerBuffer, outPingBuffer, outPongBuffer, outCloseBuffer, inPingBuffer, inPongBuffer, inCloseBuffer;
         internal readonly ArraySegment<byte> SendBuffer;
 
         private readonly ILogger log;
@@ -55,9 +55,7 @@ namespace vtortola.WebSockets.Rfc6455
 
             const int HEADER_SEGMENT_SIZE = 16;
             const int PONG_SEGMENT_SIZE = 128;
-            const int PING_HEADER_SEGMENT_SIZE = 16;
             const int PING_SEGMENT_SIZE = 128;
-            const int SEND_HEADER_SEGMENT_SIZE = 16;
             const int CLOSE_SEGMENT_SIZE = 2;
 
             this.log = options.Logger;
@@ -69,22 +67,23 @@ namespace vtortola.WebSockets.Rfc6455
             this.maskData = maskData;
 
             var bufferSize = HEADER_SEGMENT_SIZE +
-                PING_HEADER_SEGMENT_SIZE + PONG_SEGMENT_SIZE +
-                PING_HEADER_SEGMENT_SIZE + PING_SEGMENT_SIZE +
-                PING_HEADER_SEGMENT_SIZE + PONG_SEGMENT_SIZE +
-                PING_HEADER_SEGMENT_SIZE + PING_SEGMENT_SIZE +
+                HEADER_SEGMENT_SIZE + PONG_SEGMENT_SIZE +
+                HEADER_SEGMENT_SIZE + PING_SEGMENT_SIZE +
+                HEADER_SEGMENT_SIZE + PONG_SEGMENT_SIZE +
+                HEADER_SEGMENT_SIZE + PING_SEGMENT_SIZE +
                 CLOSE_SEGMENT_SIZE;
 
             var smallBuffer = this.options.BufferManager.TakeBuffer(bufferSize);
             this.headerBuffer = new ArraySegment<byte>(smallBuffer, 0, HEADER_SEGMENT_SIZE);
-            this.outPongBuffer = this.headerBuffer.NextSegment(PING_HEADER_SEGMENT_SIZE).NextSegment(PONG_SEGMENT_SIZE);
-            this.outPingBuffer = this.outPongBuffer.NextSegment(PING_HEADER_SEGMENT_SIZE).NextSegment(PING_SEGMENT_SIZE);
-            this.inPongBuffer = this.outPingBuffer.NextSegment(PING_HEADER_SEGMENT_SIZE).NextSegment(PONG_SEGMENT_SIZE);
-            this.inPingBuffer = this.inPongBuffer.NextSegment(PING_HEADER_SEGMENT_SIZE).NextSegment(PING_SEGMENT_SIZE);
-            this.closeBuffer = this.inPingBuffer.NextSegment(CLOSE_SEGMENT_SIZE);
+            this.outPongBuffer = this.headerBuffer.NextSegment(HEADER_SEGMENT_SIZE).NextSegment(PONG_SEGMENT_SIZE);
+            this.outPingBuffer = this.outPongBuffer.NextSegment(HEADER_SEGMENT_SIZE).NextSegment(PING_SEGMENT_SIZE);
+            this.outCloseBuffer = this.outPingBuffer.NextSegment(HEADER_SEGMENT_SIZE).NextSegment(CLOSE_SEGMENT_SIZE);
+            this.inPongBuffer = this.outCloseBuffer.NextSegment(HEADER_SEGMENT_SIZE).NextSegment(PONG_SEGMENT_SIZE);
+            this.inPingBuffer = this.inPongBuffer.NextSegment(HEADER_SEGMENT_SIZE).NextSegment(PING_SEGMENT_SIZE);
+            this.inCloseBuffer = this.inPingBuffer.NextSegment(HEADER_SEGMENT_SIZE).NextSegment(CLOSE_SEGMENT_SIZE);
 
             var sendBuffer = this.options.BufferManager.TakeBuffer(this.options.SendBufferSize);
-            this.SendBuffer = new ArraySegment<byte>(sendBuffer, SEND_HEADER_SEGMENT_SIZE, sendBuffer.Length - SEND_HEADER_SEGMENT_SIZE);
+            this.SendBuffer = new ArraySegment<byte>(sendBuffer, HEADER_SEGMENT_SIZE, sendBuffer.Length - HEADER_SEGMENT_SIZE);
 
             switch (options.PingMode)
             {
@@ -108,7 +107,7 @@ namespace vtortola.WebSockets.Rfc6455
                 throw new WebSocketException("There is an ongoing message await from somewhere else. Only a single write is allowed at the time.");
 
             if (this.CurrentHeader != null)
-                throw new WebSocketException("There is an ongoing message that is being readed from somewhere else");
+                throw new WebSocketException("There is an ongoing message that is being read from somewhere else");
         }
         public async Task AwaitHeaderAsync(CancellationToken cancellation)
         {
@@ -155,7 +154,7 @@ namespace vtortola.WebSockets.Rfc6455
 
                 var awaitHeaderErrorUnwrap = awaitHeaderError.Unwrap();
                 if (this.log.IsDebugEnabled && awaitHeaderErrorUnwrap is OperationCanceledException == false && this.IsConnected)
-                    this.log.Debug($"({this.GetHashCode():X}) An error occurred while async awaiting header.", awaitHeaderErrorUnwrap);
+                    this.log.Debug($"({this.GetHashCode():X}) An error occurred while async awaiting header. Connection will be closed with 'Protocol Error' code.", awaitHeaderErrorUnwrap);
 
                 if (this.IsConnected)
                     await this.CloseAsync(WebSocketCloseReason.ProtocolError).ConfigureAwait(false);
@@ -194,7 +193,7 @@ namespace vtortola.WebSockets.Rfc6455
             {
                 var readErrorUnwrap = readError.Unwrap();
                 if (this.log.IsDebugEnabled && readErrorUnwrap is OperationCanceledException == false && this.IsConnected)
-                    this.log.Debug($"({this.GetHashCode():X}) An error occurred while async reading from WebSocket.", readErrorUnwrap);
+                    this.log.Debug($"({this.GetHashCode():X}) An error occurred while async reading from WebSocket. Connection will be closed with 'Unexpected Condition' code.", readErrorUnwrap);
 
                 if (this.IsConnected)
                     await this.CloseAsync(WebSocketCloseReason.UnexpectedCondition).ConfigureAwait(false);
@@ -286,7 +285,7 @@ namespace vtortola.WebSockets.Rfc6455
                     writeErrorUnwrap = new IOException("Network connection has been closed.", writeErrorUnwrap);
 
                 if (this.log.IsDebugEnabled && writeErrorUnwrap is OperationCanceledException == false && this.IsConnected)
-                    this.log.Debug($"({this.GetHashCode():X}) Write operation on WebSocket stream is failed.", writeErrorUnwrap);
+                    this.log.Debug($"({this.GetHashCode():X}) Write operation on WebSocket stream is failed. Connection will be closed with 'Unexpected Condition' code.", writeErrorUnwrap);
 
                 if (this.IsConnected)
                     await this.CloseAsync(WebSocketCloseReason.UnexpectedCondition).ConfigureAwait(false);
@@ -314,7 +313,7 @@ namespace vtortola.WebSockets.Rfc6455
             if (read != headerLength)
             {
                 if (this.log.IsWarningEnabled)
-                    this.log.Warning($"{nameof(this.ParseHeaderAsync)} is called with {read} bytes buffer. While whole header is {headerLength} bytes length.");
+                    this.log.Warning($"{nameof(this.ParseHeaderAsync)} is called with {read} bytes buffer. While whole header is {headerLength} bytes length. Connection will be closed with 'Protocol Error' code.");
 
                 await this.CloseAsync(WebSocketCloseReason.ProtocolError).ConfigureAwait(false);
                 return;
@@ -357,7 +356,7 @@ namespace vtortola.WebSockets.Rfc6455
                     throw new WebSocketException("Text, Continuation or Binary are not protocol frames");
 
                 case WebSocketFrameOption.ConnectionClose:
-                    Interlocked.CompareExchange(ref this.closeState, CLOSE_STATE_CLOSED, CLOSE_STATE_OPEN);
+                    var wasOpen = Interlocked.CompareExchange(ref this.closeState, CLOSE_STATE_CLOSED, CLOSE_STATE_OPEN) == CLOSE_STATE_OPEN;
                     
                     const int CLOSE_BYTES_TO_READ = 2;
                     var closeMessageOffset = 0;
@@ -365,8 +364,8 @@ namespace vtortola.WebSockets.Rfc6455
                     {
                         var closeBytesRead = await this.networkConnection.ReadAsync
                         (
-                            this.closeBuffer.Array, 
-                            this.closeBuffer.Offset + closeMessageOffset, 
+                            this.inCloseBuffer.Array, 
+                            this.inCloseBuffer.Offset + closeMessageOffset, 
                             CLOSE_BYTES_TO_READ - closeMessageOffset, 
                             CancellationToken.None
                         ).ConfigureAwait(false);
@@ -378,11 +377,25 @@ namespace vtortola.WebSockets.Rfc6455
                         
                         closeMessageOffset += closeBytesRead;
                     }
-                    
+
                     if (closeMessageOffset >= CLOSE_BYTES_TO_READ)
                     {
-                        Array.Reverse(this.closeBuffer.Array, this.closeBuffer.Offset, CLOSE_BYTES_TO_READ);
-                        this.CloseReason = (WebSocketCloseReason)BitConverter.ToUInt16(this.closeBuffer.Array, this.closeBuffer.Offset);
+                        Array.Reverse(this.inCloseBuffer.Array, this.inCloseBuffer.Offset, CLOSE_BYTES_TO_READ);
+                        this.CloseReason = (WebSocketCloseReason)BitConverter.ToUInt16(this.inCloseBuffer.Array, this.inCloseBuffer.Offset);
+                        Array.Reverse(this.inCloseBuffer.Array, this.inCloseBuffer.Offset, CLOSE_BYTES_TO_READ);
+                    }
+                    else
+                    {
+                        this.CloseReason = WebSocketCloseReason.NormalClose;
+                        ((ushort)this.CloseReason).ToBytesBackwards(this.inCloseBuffer.Array, this.inCloseBuffer.Offset);
+                    }
+
+                    if (wasOpen)
+                    {
+                        var closeFrame = this.PrepareFrame(this.inCloseBuffer, CLOSE_BYTES_TO_READ, true, false, (WebSocketMessageType)WebSocketFrameOption.ConnectionClose, WebSocketExtensionFlags.None);
+                        await this.SendFrameAsync(closeFrame, Timeout.InfiniteTimeSpan, SendOptions.NoErrors | SendOptions.IgnoreClose, CancellationToken.None).ConfigureAwait(false);
+                        await this.networkConnection.FlushAsync(CancellationToken.None).ConfigureAwait(false);
+                        await this.networkConnection.CloseAsync().ConfigureAwait(false);
                     }
                     
                     this.Dispose();
@@ -439,9 +452,9 @@ namespace vtortola.WebSockets.Rfc6455
             await this.writeSemaphore.WaitAsync().ConfigureAwait(false);
             try
             {
-                ((ushort)reason).ToBytesBackwards(this.closeBuffer.Array, this.closeBuffer.Offset);
+                ((ushort)reason).ToBytesBackwards(this.outCloseBuffer.Array, this.outCloseBuffer.Offset);
                 var messageType = (WebSocketMessageType)WebSocketFrameOption.ConnectionClose;
-                var closeFrame = this.PrepareFrame(this.closeBuffer, 2, true, false, messageType, WebSocketExtensionFlags.None);
+                var closeFrame = this.PrepareFrame(this.outCloseBuffer, 2, true, false, messageType, WebSocketExtensionFlags.None);
 
                 await this.SendFrameAsync(closeFrame, Timeout.InfiniteTimeSpan, SendOptions.NoLock | SendOptions.NoErrors | SendOptions.IgnoreClose, CancellationToken.None).ConfigureAwait(false);
                 await this.networkConnection.FlushAsync(CancellationToken.None).ConfigureAwait(false);
@@ -496,7 +509,7 @@ namespace vtortola.WebSockets.Rfc6455
             SafeEnd.Dispose(this.writeSemaphore, this.log);
 
             this.options.BufferManager.ReturnBuffer(this.SendBuffer.Array);
-            this.options.BufferManager.ReturnBuffer(this.closeBuffer.Array);
+            this.options.BufferManager.ReturnBuffer(this.headerBuffer.Array);
         }
     }
 
