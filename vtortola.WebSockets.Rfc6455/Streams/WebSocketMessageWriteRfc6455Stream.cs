@@ -137,7 +137,7 @@ namespace vtortola.WebSockets.Rfc6455
             if (oldState == STATE_DISPOSED)
                 return;
 
-            if (this.webSocket.Connection.IsConnected == false)
+            if (this.webSocket.Connection.CanSend == false)
                 return;
 
             if (oldState != STATE_CLOSED)

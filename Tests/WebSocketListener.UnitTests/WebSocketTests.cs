@@ -72,7 +72,7 @@ namespace vtortola.WebSockets.UnitTests
 
                 // DateTime has no millisecond precision. 
                 Thread.Sleep(500);
-                Assert.False(ws.IsConnected);
+                Assert.True(ws.IsConnected);
             }
         }
 

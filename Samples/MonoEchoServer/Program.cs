@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -154,12 +154,15 @@ namespace MonoEchoServer
                     catch (Exception readWriteError)
                     {
                         Log.Error("An error occurred while reading/writing echo message.", readWriteError);
-                        await webSocket.CloseAsync().ConfigureAwait(false);
                     }
                 }
+
+                // close socket before dispose
+                await webSocket.CloseAsync(WebSocketCloseReason.NormalClose);
             }
             finally
             {
+                // dispose socket after use
                 webSocket.Dispose();
                 Log.Warning("Client '" + webSocket.RemoteEndpoint + "' disconnected.");
             }

@@ -144,12 +144,15 @@ namespace WebSocketListenerTests.Echo
                     catch (Exception readWriteError)
                     {
                         Log.Error("An error occurred while reading/writing echo message.", readWriteError);
-                        await webSocket.CloseAsync().ConfigureAwait(false);
                     }
                 }
+
+                // close socket before dispose
+                await webSocket.CloseAsync(WebSocketCloseReason.NormalClose);
             }
             finally
             {
+                // always dispose socket after use
                 webSocket.Dispose();
                 Log.Warning("Client '" + webSocket.RemoteEndpoint + "' disconnected.");
             }

@@ -18,7 +18,7 @@ namespace vtortola.WebSockets.Rfc6455
 
         public override EndPoint RemoteEndpoint { get; }
         public override EndPoint LocalEndpoint { get; }
-        public override bool IsConnected => this.Connection.IsConnected;
+        public override bool IsConnected => this.Connection.CanReceive || this.Connection.CanSend;
         public override TimeSpan Latency => this.Connection.Latency;
         public override string SubProtocol { get; }
         public override WebSocketCloseReason? CloseReason => this.Connection.CloseReason;
@@ -45,7 +45,7 @@ namespace vtortola.WebSockets.Rfc6455
         public override async Task<WebSocketMessageReadStream> ReadMessageAsync(CancellationToken token)
         {
             await this.Connection.AwaitHeaderAsync(token).ConfigureAwait(false);
-            if (this.Connection.IsConnected && this.Connection.CurrentHeader != null)
+            if (this.Connection.CanReceive && this.Connection.CurrentHeader != null)
             {
                 WebSocketMessageReadStream reader = new WebSocketMessageReadRfc6455Stream(this);
                 foreach (var extension in this.extensions)
@@ -57,8 +57,8 @@ namespace vtortola.WebSockets.Rfc6455
 
         public override WebSocketMessageWriteStream CreateMessageWriter(WebSocketMessageType messageType)
         {
-            if (!this.Connection.IsConnected)
-                throw new WebSocketException("Unable to write new message because underlying connection is closed.");
+            if (!this.Connection.CanSend)
+                throw new WebSocketException("Unable to write new message because underlying connection is closed or close frame is sent.");
 
             this.Connection.BeginWriting();
             WebSocketMessageWriteStream writer = new WebSocketMessageWriteRfc6455Stream(this, messageType);

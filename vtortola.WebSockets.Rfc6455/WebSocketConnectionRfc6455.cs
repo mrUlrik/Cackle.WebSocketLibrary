@@ -14,11 +14,12 @@ namespace vtortola.WebSockets.Rfc6455
         [Flags]
         internal enum SendOptions { None, NoLock = 0x1, NoErrors = 0x2, IgnoreClose = 0x4 }
 
-        private const int CLOSE_STATE_OPEN = 0;
-        private const int CLOSE_STATE_CLOSED = 1;
-        private const int CLOSE_STATE_DISPOSED = 2;
+        private const int WS_STATE_OPEN = 0;
+        private const int WS_STATE_CLOSE_SENT = 1;
+        private const int WS_STATE_CLOSE_RECEIVED = 2;
+        private const int WS_STATE_CLOSED = 3;
+        private const int WS_STATE_DISPOSED = 4;
 
-        //    readonly Byte[] _buffer;
         private readonly ArraySegment<byte> headerBuffer, outPingBuffer, outPongBuffer, outCloseBuffer, inPingBuffer, inPongBuffer, inCloseBuffer;
         internal readonly ArraySegment<byte> SendBuffer;
 
@@ -34,9 +35,11 @@ namespace vtortola.WebSockets.Rfc6455
         private TimeSpan latency;
 
         public ILogger Log => this.log;
-        public bool IsConnected => this.closeState == CLOSE_STATE_OPEN;
-        public bool IsClosed => this.closeState >= CLOSE_STATE_CLOSED;
-         
+
+        public bool CanReceive => this.closeState == WS_STATE_OPEN || this.closeState == WS_STATE_CLOSE_SENT;
+        public bool CanSend => this.closeState == WS_STATE_OPEN || this.closeState == WS_STATE_CLOSE_RECEIVED;
+        public bool IsClosed => this.closeState >= WS_STATE_CLOSED;
+
         public TimeSpan Latency
         {
             get
@@ -107,14 +110,14 @@ namespace vtortola.WebSockets.Rfc6455
                 throw new WebSocketException("There is an ongoing message await from somewhere else. Only a single write is allowed at the time.");
 
             if (this.CurrentHeader != null)
-                throw new WebSocketException("There is an ongoing message that is being read from somewhere else");
+                throw new WebSocketException("There is an ongoing message that is being read from somewhere else.");
         }
         public async Task AwaitHeaderAsync(CancellationToken cancellation)
         {
             this.CheckForDoubleRead();
             try
             {
-                while (this.IsConnected && this.CurrentHeader == null)
+                while (this.CanReceive && this.CurrentHeader == null)
                 {
                     var buffered = 0;
                     var estimatedHeaderLength = 2;
@@ -149,15 +152,14 @@ namespace vtortola.WebSockets.Rfc6455
             }
             catch (Exception awaitHeaderError) when (awaitHeaderError.Unwrap() is ThreadAbortException == false)
             {
-                if (!this.IsConnected)
+                if (this.IsClosed)
                     return;
 
                 var awaitHeaderErrorUnwrap = awaitHeaderError.Unwrap();
-                if (this.log.IsDebugEnabled && awaitHeaderErrorUnwrap is OperationCanceledException == false && this.IsConnected)
+                if (this.log.IsDebugEnabled && awaitHeaderErrorUnwrap is OperationCanceledException == false)
                     this.log.Debug($"({this.GetHashCode():X}) An error occurred while async awaiting header. Connection will be closed with 'Protocol Error' code.", awaitHeaderErrorUnwrap);
 
-                if (this.IsConnected)
-                    await this.CloseAsync(WebSocketCloseReason.ProtocolError).ConfigureAwait(false);
+                await this.CloseAsync(WebSocketCloseReason.ProtocolError).ConfigureAwait(false);
 
                 if (awaitHeaderErrorUnwrap is WebSocketException == false && awaitHeaderErrorUnwrap is OperationCanceledException == false)
                     throw new WebSocketException("Read operation on WebSocket stream is failed. More detailed information in inner exception.", awaitHeaderErrorUnwrap);
@@ -192,11 +194,10 @@ namespace vtortola.WebSockets.Rfc6455
             catch (Exception readError) when (readError.Unwrap() is ThreadAbortException == false)
             {
                 var readErrorUnwrap = readError.Unwrap();
-                if (this.log.IsDebugEnabled && readErrorUnwrap is OperationCanceledException == false && this.IsConnected)
+                if (this.log.IsDebugEnabled && readErrorUnwrap is OperationCanceledException == false && !this.IsClosed)
                     this.log.Debug($"({this.GetHashCode():X}) An error occurred while async reading from WebSocket. Connection will be closed with 'Unexpected Condition' code.", readErrorUnwrap);
 
-                if (this.IsConnected)
-                    await this.CloseAsync(WebSocketCloseReason.UnexpectedCondition).ConfigureAwait(false);
+                await this.CloseAsync(WebSocketCloseReason.UnexpectedCondition).ConfigureAwait(false);
 
                 if (readErrorUnwrap is WebSocketException == false && readErrorUnwrap is OperationCanceledException == false)
                     throw new WebSocketException("Read operation on WebSocket stream is failed: " + readErrorUnwrap.Message, readErrorUnwrap);
@@ -284,11 +285,10 @@ namespace vtortola.WebSockets.Rfc6455
                 if (writeErrorUnwrap is ObjectDisposedException)
                     writeErrorUnwrap = new IOException("Network connection has been closed.", writeErrorUnwrap);
 
-                if (this.log.IsDebugEnabled && writeErrorUnwrap is OperationCanceledException == false && this.IsConnected)
+                if (this.log.IsDebugEnabled && writeErrorUnwrap is OperationCanceledException == false && !this.IsClosed)
                     this.log.Debug($"({this.GetHashCode():X}) Write operation on WebSocket stream is failed. Connection will be closed with 'Unexpected Condition' code.", writeErrorUnwrap);
 
-                if (this.IsConnected)
-                    await this.CloseAsync(WebSocketCloseReason.UnexpectedCondition).ConfigureAwait(false);
+                await this.CloseAsync(WebSocketCloseReason.UnexpectedCondition).ConfigureAwait(false);
 
                 if (writeErrorUnwrap is WebSocketException == false && writeErrorUnwrap is OperationCanceledException == false)
                     throw new WebSocketException("Write operation on WebSocket stream is failed: " + writeErrorUnwrap.Message, writeErrorUnwrap);
@@ -334,7 +334,9 @@ namespace vtortola.WebSockets.Rfc6455
                 this.CurrentHeader = null;
             }
             else
+            {
                 this.ongoingMessageAwaiting = 0;
+            }
 
             try
             {
@@ -356,25 +358,23 @@ namespace vtortola.WebSockets.Rfc6455
                     throw new WebSocketException("Text, Continuation or Binary are not protocol frames");
 
                 case WebSocketFrameOption.ConnectionClose:
-                    var wasOpen = Interlocked.CompareExchange(ref this.closeState, CLOSE_STATE_CLOSED, CLOSE_STATE_OPEN) == CLOSE_STATE_OPEN;
-                    
                     const int CLOSE_BYTES_TO_READ = 2;
                     var closeMessageOffset = 0;
                     while (closeMessageOffset < CLOSE_BYTES_TO_READ)
                     {
                         var closeBytesRead = await this.networkConnection.ReadAsync
                         (
-                            this.inCloseBuffer.Array, 
-                            this.inCloseBuffer.Offset + closeMessageOffset, 
-                            CLOSE_BYTES_TO_READ - closeMessageOffset, 
+                            this.inCloseBuffer.Array,
+                            this.inCloseBuffer.Offset + closeMessageOffset,
+                            CLOSE_BYTES_TO_READ - closeMessageOffset,
                             CancellationToken.None
                         ).ConfigureAwait(false);
-                        
+
                         if (closeBytesRead == 0)
                         {
                             break; // connection closed, no more data
                         }
-                        
+
                         closeMessageOffset += closeBytesRead;
                     }
 
@@ -390,17 +390,19 @@ namespace vtortola.WebSockets.Rfc6455
                         ((ushort)this.CloseReason).ToBytesBackwards(this.inCloseBuffer.Array, this.inCloseBuffer.Offset);
                     }
 
-                    if (wasOpen)
+                    if (Interlocked.CompareExchange(ref this.closeState, WS_STATE_CLOSE_RECEIVED, WS_STATE_OPEN) == WS_STATE_OPEN)
                     {
-                        var closeFrame = this.PrepareFrame(this.inCloseBuffer, CLOSE_BYTES_TO_READ, true, false, (WebSocketMessageType)WebSocketFrameOption.ConnectionClose, WebSocketExtensionFlags.None);
-                        await this.SendFrameAsync(closeFrame, Timeout.InfiniteTimeSpan, SendOptions.NoErrors | SendOptions.IgnoreClose, CancellationToken.None).ConfigureAwait(false);
-                        await this.networkConnection.FlushAsync(CancellationToken.None).ConfigureAwait(false);
+                        if (this.log.IsDebugEnabled)
+                            this.log.Debug("A close frame is received while websocket in 'Open' state. Switching state to 'CloseReceived'.");
+                    }
+                    if (Interlocked.CompareExchange(ref this.closeState, WS_STATE_CLOSED, WS_STATE_CLOSE_SENT) == WS_STATE_CLOSE_SENT)
+                    {
+                        if (this.log.IsDebugEnabled)
+                            this.log.Debug("A close frame is received while websocket in 'CloseSent' state. Switching state to 'Closed'.");
+
                         await this.networkConnection.CloseAsync().ConfigureAwait(false);
                     }
-                    
-                    this.Dispose();
                     break;
-
                 case WebSocketFrameOption.Ping:
                 case WebSocketFrameOption.Pong:
                     var contentLength = this.inPongBuffer.Count;
@@ -440,14 +442,20 @@ namespace vtortola.WebSockets.Rfc6455
 
                     break;
                 default:
-                    throw new WebSocketException("Unexpected header option '" + this.CurrentHeader.Flags.Option.ToString() + "'");
+                    throw new WebSocketException($"Unexpected header option '{this.CurrentHeader.Flags.Option}'");
             }
         }
 
         public async Task CloseAsync(WebSocketCloseReason reason)
         {
-            if (Interlocked.CompareExchange(ref this.closeState, CLOSE_STATE_CLOSED, CLOSE_STATE_OPEN) != CLOSE_STATE_OPEN)
+            if (Interlocked.CompareExchange(ref this.closeState, WS_STATE_CLOSE_SENT, WS_STATE_OPEN) != WS_STATE_OPEN &&
+                Interlocked.CompareExchange(ref this.closeState, WS_STATE_CLOSED, WS_STATE_CLOSE_RECEIVED) != WS_STATE_CLOSE_RECEIVED)
+            {
                 return;
+            }
+
+            if (this.log.IsDebugEnabled)
+                this.log.Debug($"A close is called on websocket. Switching state to '{(this.closeState == WS_STATE_CLOSE_SENT ? "CloseSent" : "Closed")}'.");
 
             await this.writeSemaphore.WaitAsync().ConfigureAwait(false);
             try
@@ -458,7 +466,11 @@ namespace vtortola.WebSockets.Rfc6455
 
                 await this.SendFrameAsync(closeFrame, Timeout.InfiniteTimeSpan, SendOptions.NoLock | SendOptions.NoErrors | SendOptions.IgnoreClose, CancellationToken.None).ConfigureAwait(false);
                 await this.networkConnection.FlushAsync(CancellationToken.None).ConfigureAwait(false);
-                await this.networkConnection.CloseAsync().ConfigureAwait(false);
+
+                if (this.closeState >= WS_STATE_CLOSED)
+                {
+                    await this.networkConnection.CloseAsync().ConfigureAwait(false);
+                }
             }
             catch (Exception closeError) when (closeError.Unwrap() is ThreadAbortException == false)
             {
@@ -476,7 +488,7 @@ namespace vtortola.WebSockets.Rfc6455
         }
         public Task PingAsync(byte[] data, int offset, int count)
         {
-            if (this.IsClosed || this.IsConnected == false)
+            if (!this.CanSend)
                 return TaskHelper.CompletedTask;
 
             if (this.pingHandler is ManualPing)
@@ -500,7 +512,7 @@ namespace vtortola.WebSockets.Rfc6455
 
         public void Dispose()
         {
-            if (Interlocked.Exchange(ref this.closeState, CLOSE_STATE_DISPOSED) == CLOSE_STATE_DISPOSED)
+            if (Interlocked.Exchange(ref this.closeState, WS_STATE_DISPOSED) == WS_STATE_DISPOSED)
                 return;
 
             this.latency = Timeout.InfiniteTimeSpan;
