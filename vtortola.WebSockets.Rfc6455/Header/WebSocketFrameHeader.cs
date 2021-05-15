@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using vtortola.WebSockets.Rfc6455.Header;
 
 namespace vtortola.WebSockets.Rfc6455
 {
@@ -40,19 +41,19 @@ namespace vtortola.WebSockets.Rfc6455
             }
             else if (this.ContentLength <= ushort.MaxValue)
             {
-                ((ushort)this.ContentLength).ToBytesBackwards(buffer, offset + written);
+                EndianBitConverter.UInt16CopyBytesBe((ushort)this.ContentLength, buffer, offset + written);
                 written += 2;
             }
             else
             {
-                ((ulong)this.ContentLength).ToBytesBackwards(buffer, offset + written);
+                EndianBitConverter.UInt64CopyBytesBe((ulong)this.ContentLength, buffer, offset + written);
                 written += 8;
             }
             // write mask is it is masked message
             if (this.Flags.MASK)
             {
-               this.MaskKey.ToBytes(buffer, offset + written);
-               written += 4;
+                EndianBitConverter.UInt32CopyBytesLe(this.MaskKey, buffer, offset + written);
+                written += 4;
             }
             return written;
         }
@@ -97,19 +98,14 @@ namespace vtortola.WebSockets.Rfc6455
                 if (availableLength < headerLength)
                     return false;
 
-                if (BitConverter.IsLittleEndian)
-                    frameStart.ReversePortion(offset + 2, 2);
-                contentLength = BitConverter.ToUInt16(frameStart, offset + 2);
+                contentLength = EndianBitConverter.ToUInt16Be(frameStart, offset + 2);
             }
             else if (contentLength == 127)
             {
                 if (availableLength < headerLength)
                     return false;
 
-                if (BitConverter.IsLittleEndian)
-                    frameStart.ReversePortion(offset + 2, 8);
-
-                var length = BitConverter.ToUInt64(frameStart, offset + 2);
+                var length = EndianBitConverter.ToUInt64Be(frameStart, offset + 2);
                 if (length > long.MaxValue)
                 {
                     throw new WebSocketException("The maximum supported frame length is 9223372036854775807, current frame is " + length.ToString());
@@ -130,10 +126,7 @@ namespace vtortola.WebSockets.Rfc6455
             if (flags.MASK)
             {
                 headerLength -= 4;
-                if (BitConverter.IsLittleEndian == false)
-                    Array.Reverse(frameStart, offset + headerLength, 4);
-
-                maskKey = BitConverter.ToUInt32(frameStart, offset + headerLength);
+                maskKey = EndianBitConverter.ToUInt32Le(frameStart, offset + headerLength);
             }
 
             header = new WebSocketFrameHeader
@@ -185,7 +178,6 @@ namespace vtortola.WebSockets.Rfc6455
             if (BitConverter.IsLittleEndian == false)
                 maskKey = ReverseBytes(maskKey); // reverse to little-endian
 
-
             if (maskOffset != 0)
             {
                 switch (4 - maskOffset % 4)
@@ -212,7 +204,7 @@ namespace vtortola.WebSockets.Rfc6455
                     }
                     offset += quartetsCount * 4;
                     count -= quartetsCount * 4;
-                }                
+                }
             }
 
             switch (bytesLeft)

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using vtortola.WebSockets.Rfc6455.Header;
 
 namespace vtortola.WebSockets.Rfc6455
 {
@@ -46,7 +47,7 @@ namespace vtortola.WebSockets.Rfc6455
                     return;
                 }
 
-                ((ulong)Stopwatch.GetTimestamp()).ToBytes(this.pingBuffer.Array, this.pingBuffer.Offset);
+                EndianBitConverter.UInt64CopyBytesLe((ulong)Stopwatch.GetTimestamp(), this.pingBuffer.Array, this.pingBuffer.Offset);
                 var messageType = (WebSocketMessageType)WebSocketFrameOption.Ping;
 
                 var pingFrame = this.connection.PrepareFrame(this.pingBuffer, 8, true, false, messageType, WebSocketExtensionFlags.None);
@@ -73,7 +74,7 @@ namespace vtortola.WebSockets.Rfc6455
             {
                 this.NotifyActivity();
 
-                var timeDelta = TimestampToTimeSpan(Stopwatch.GetTimestamp() - BitConverter.ToInt64(pongBuffer.Array, pongBuffer.Offset));
+                var timeDelta = TimestampToTimeSpan(Stopwatch.GetTimestamp() - (long)EndianBitConverter.ToUInt64Le(pongBuffer.Array, pongBuffer.Offset));
                 this.connection.latency = TimeSpan.FromMilliseconds(Math.Max(0, timeDelta.TotalMilliseconds / 2));
             }
         }

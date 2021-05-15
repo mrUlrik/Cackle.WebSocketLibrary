@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using vtortola.WebSockets.Rfc6455.Header;
 using vtortola.WebSockets.Tools;
 using vtortola.WebSockets.Transports;
 
@@ -358,15 +359,15 @@ namespace vtortola.WebSockets.Rfc6455
                     throw new WebSocketException("Text, Continuation or Binary are not protocol frames");
 
                 case WebSocketFrameOption.ConnectionClose:
-                    const int CLOSE_BYTES_TO_READ = 2;
+                    var closePayloadToRead = Math.Min(2, (int)this.CurrentHeader.ContentLength);
                     var closeMessageOffset = 0;
-                    while (closeMessageOffset < CLOSE_BYTES_TO_READ)
+                    while (closeMessageOffset < closePayloadToRead)
                     {
                         var closeBytesRead = await this.networkConnection.ReadAsync
                         (
                             this.inCloseBuffer.Array,
                             this.inCloseBuffer.Offset + closeMessageOffset,
-                            CLOSE_BYTES_TO_READ - closeMessageOffset,
+                            closePayloadToRead - closeMessageOffset,
                             CancellationToken.None
                         ).ConfigureAwait(false);
 
@@ -378,16 +379,17 @@ namespace vtortola.WebSockets.Rfc6455
                         closeMessageOffset += closeBytesRead;
                     }
 
-                    if (closeMessageOffset >= CLOSE_BYTES_TO_READ)
+                    if (closeMessageOffset >= closePayloadToRead && closePayloadToRead >= 2)
                     {
-                        Array.Reverse(this.inCloseBuffer.Array, this.inCloseBuffer.Offset, CLOSE_BYTES_TO_READ);
-                        this.CloseReason = (WebSocketCloseReason)BitConverter.ToUInt16(this.inCloseBuffer.Array, this.inCloseBuffer.Offset);
-                        Array.Reverse(this.inCloseBuffer.Array, this.inCloseBuffer.Offset, CLOSE_BYTES_TO_READ);
+                        this.CurrentHeader.DecodeBytes(this.inCloseBuffer.Array, this.inCloseBuffer.Offset, 2);
+
+                        this.CloseReason = (WebSocketCloseReason)EndianBitConverter.ToUInt16Be(this.inCloseBuffer.Array, this.inCloseBuffer.Offset);
                     }
                     else
                     {
                         this.CloseReason = WebSocketCloseReason.NormalClose;
-                        ((ushort)this.CloseReason).ToBytesBackwards(this.inCloseBuffer.Array, this.inCloseBuffer.Offset);
+
+                        EndianBitConverter.UInt16CopyBytesBe((ushort)this.CloseReason, this.inCloseBuffer.Array, this.inCloseBuffer.Offset);
                     }
 
                     if (Interlocked.CompareExchange(ref this.closeState, WS_STATE_CLOSE_RECEIVED, WS_STATE_OPEN) == WS_STATE_OPEN)
@@ -400,7 +402,7 @@ namespace vtortola.WebSockets.Rfc6455
                         if (this.log.IsDebugEnabled)
                             this.log.Debug("A close frame is received while websocket in 'CloseSent' state. Switching state to 'Closed'.");
 
-                        await this.networkConnection.CloseAsync().ConfigureAwait(false);
+                        await this.networkConnection.CloseAsync().ConfigureAwait(false); // Possible RC with CloseAsync() cause premature close without sending our close frame
                     }
                     break;
                 case WebSocketFrameOption.Ping:
@@ -460,7 +462,7 @@ namespace vtortola.WebSockets.Rfc6455
             await this.writeSemaphore.WaitAsync().ConfigureAwait(false);
             try
             {
-                ((ushort)reason).ToBytesBackwards(this.outCloseBuffer.Array, this.outCloseBuffer.Offset);
+                EndianBitConverter.UInt16CopyBytesBe((ushort)reason, this.outCloseBuffer.Array, this.outCloseBuffer.Offset);
                 var messageType = (WebSocketMessageType)WebSocketFrameOption.ConnectionClose;
                 var closeFrame = this.PrepareFrame(this.outCloseBuffer, 2, true, false, messageType, WebSocketExtensionFlags.None);
 

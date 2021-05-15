@@ -26,59 +26,5 @@ namespace vtortola.WebSockets.Rfc6455
                 buffer[back--] = pivot;
             }
         }
-
-        internal static void ToBytes(this ushort value, byte[] buffer, int offset)
-        {
-            for (var i = 0; i < 2; i++)
-            {
-                buffer[offset + i] = (byte)value;
-                value >>= 8;
-            }
-        }
-
-        internal static void ToBytes(this uint value, byte[] buffer, int offset)
-        {
-            for (var i = 0; i < 4; i++)
-            {
-                buffer[offset + i] = (byte)value;
-                value >>= 8;
-            }
-        }
-
-        internal static void ToBytes(this ulong value, byte[] buffer, int offset)
-        {
-            for (var i = 0; i < 8; i++)
-            {
-                buffer[offset + i] = (byte)value;
-                value >>= 8;
-            }
-        }
-
-        internal static void ToBytesBackwards(this ushort value, byte[] buffer, int offset)
-        {
-            for (var i = offset + 1; i >= offset; i--)
-            {
-                buffer[i] = (byte)value;
-                value >>= 8;
-            }
-        }
-
-        internal static void ToBytesBackwards(this uint value, byte[] buffer, int offset)
-        {
-            for (var i = offset + 3; i >= offset; i--)
-            {
-                buffer[i] = (byte)value;
-                value >>= 8;
-            }
-        }
-
-        internal static void ToBytesBackwards(this ulong value, byte[] buffer, int offset)
-        {
-            for (var i = offset + 7; i >= offset; i--)
-            {
-                buffer[i] = (byte)value;
-                value >>= 8;
-            }
-        }
     }
 }
