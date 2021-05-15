@@ -7,7 +7,7 @@
 https://github.com/deniszykov/WebSocketListener</Description>
 		<Company>deniszykov</Company>
 		<Product>deniszykov.WebSocketListener</Product>
-		<Version>4.2.13</Version>
+		<Version>4.2.14</Version>
 		<Authors>Valeriano Tortola, Denis Zykov</Authors>
 		<PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/deniszykov/WebSocketListener</PackageProjectUrl>
@@ -16,7 +16,10 @@ https://github.com/deniszykov/WebSocketListener</Description>
 		<PackageTags>websockets HTML5 realtime streaming sockets server client async asynchronous</PackageTags>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\WebSocketListener.snk</AssemblyOriginatorKeyFile>		
-		<PackageReleaseNotes>v.4.2.11
+		<PackageReleaseNotes>v.4.2.14
+fixed connection close reason parsing and hung(and timeout) after receiving close frame from client.
+
+v.4.2.11
 added close reply if remote party is requesting connection close.
 
 v.4.2.10
