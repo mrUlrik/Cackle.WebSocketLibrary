@@ -154,6 +154,7 @@ namespace MonoEchoServer
                     catch (Exception readWriteError)
                     {
                         Log.Error("An error occurred while reading/writing echo message.", readWriteError);
+                        break;
                     }
                 }
 
