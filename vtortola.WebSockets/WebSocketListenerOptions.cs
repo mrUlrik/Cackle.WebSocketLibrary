@@ -83,10 +83,10 @@ namespace vtortola.WebSockets
                 throw new WebSocketException($"{nameof(this.SendBufferSize)} must be bigger than 1024. Actual value: {this.SendBufferSize}");
             }
 
-            if (this.BufferManager != null && this.SendBufferSize > this.BufferManager.LargeBufferSize)
+            if (this.BufferManager != null && this.BufferManager.LargeBufferSize < this.SendBufferSize)
             {
-                throw new WebSocketException($"{nameof(WebSocketListenerOptions)}.{nameof(this.BufferManager)}.{nameof(this.BufferManager.LargeBufferSize)}. must be " +
-                    $"bigger or equals to {nameof(WebSocketListenerOptions)}.{nameof(this.SendBufferSize)}. " +
+                throw new WebSocketException($"{nameof(WebSocketListenerOptions)}.{nameof(this.BufferManager)}.{nameof(this.BufferManager.LargeBufferSize)} must be " +
+                    $"larger or equals to {nameof(WebSocketListenerOptions)}.{nameof(this.SendBufferSize)}. " +
                     $"Value of {nameof(this.SendBufferSize)}: {this.SendBufferSize}. Value of {nameof(this.BufferManager.LargeBufferSize)}: {this.BufferManager.LargeBufferSize}.");
             }
 
