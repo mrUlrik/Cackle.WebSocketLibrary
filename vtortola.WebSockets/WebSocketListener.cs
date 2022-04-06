@@ -60,7 +60,7 @@ namespace vtortola.WebSockets
             options.CheckCoherence();
             this.options = options.Clone();
             if (this.options.BufferManager == null)
-                this.options.BufferManager = BufferManager.CreateBufferManager(100, this.options.SendBufferSize); // create small buffer pool if not configured
+                this.options.BufferManager = BufferManager.CreateBufferManager(this.options.SendBufferSize * 100, this.options.SendBufferSize); // create small buffer pool if not configured
             if (this.options.Logger == null)
                 this.options.Logger = NullLogger.Instance;
             this.log = this.options.Logger;

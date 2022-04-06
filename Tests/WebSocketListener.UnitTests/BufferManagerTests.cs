@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Xunit;
 
 namespace vtortola.WebSockets.UnitTests
@@ -19,7 +19,7 @@ namespace vtortola.WebSockets.UnitTests
         InlineData(2049)]
         public void TakeBuffer(int maxBufferSize)
         {
-            var bufferManager = BufferManager.CreateBufferManager(100, maxBufferSize);
+            var bufferManager = BufferManager.CreateBufferManager(maxBufferSize * 100, maxBufferSize);
             var buffer = bufferManager.TakeBuffer(maxBufferSize);
 
             Assert.NotNull(buffer);
@@ -47,7 +47,7 @@ namespace vtortola.WebSockets.UnitTests
         InlineData(4096, 2049)]
         public void TakeSmallBuffer(int maxBufferSize, int takeBufferSize)
         {
-            var bufferManager = BufferManager.CreateBufferManager(100, maxBufferSize);
+            var bufferManager = BufferManager.CreateBufferManager(maxBufferSize * 100, maxBufferSize);
             var buffer = bufferManager.TakeBuffer(takeBufferSize);
 
             Assert.NotNull(buffer);
@@ -68,7 +68,7 @@ namespace vtortola.WebSockets.UnitTests
         InlineData(2049)]
         public void ReturnBuffer(int maxBufferSize)
         {
-            var bufferManager = BufferManager.CreateBufferManager(100, maxBufferSize);
+            var bufferManager = BufferManager.CreateBufferManager(maxBufferSize * 100, maxBufferSize);
             var buffer = bufferManager.TakeBuffer(maxBufferSize);
 
             Assert.NotNull(buffer);
@@ -97,7 +97,7 @@ namespace vtortola.WebSockets.UnitTests
         InlineData(4096, 2049)]
         public void ReturnSmallBuffer(int maxBufferSize, int takeBufferSize)
         {
-            var bufferManager = BufferManager.CreateBufferManager(100, maxBufferSize);
+            var bufferManager = BufferManager.CreateBufferManager(maxBufferSize * 100, maxBufferSize);
             var buffer = bufferManager.TakeBuffer(takeBufferSize);
 
             Assert.NotNull(buffer);

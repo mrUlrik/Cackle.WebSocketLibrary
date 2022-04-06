@@ -25,7 +25,7 @@ namespace vtortola.WebSockets.UnitTests
             {
                 Logger = logger,
                 PingTimeout = Timeout.InfiniteTimeSpan,
-                BufferManager = BufferManager.CreateBufferManager(10, 1024),
+                BufferManager = BufferManager.CreateBufferManager(1024, 1024),
                 SendBufferSize = 512
             };
         }

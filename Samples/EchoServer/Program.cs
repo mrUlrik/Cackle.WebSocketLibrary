@@ -37,6 +37,7 @@ namespace WebSocketListenerTests.Echo
                 PingMode = PingMode.Manual,
                 ParallelNegotiations = 16,
                 NegotiationQueueCapacity = 256,
+                SendBufferSize = bufferSize,
                 BufferManager = BufferManager.CreateBufferManager(bufferPoolSize, bufferSize),
                 Logger = Log
             };

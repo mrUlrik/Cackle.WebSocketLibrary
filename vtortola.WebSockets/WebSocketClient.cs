@@ -57,7 +57,7 @@ namespace vtortola.WebSockets
             this.pendingRequests = new ConcurrentDictionary<WebSocketHandshake, Task<WebSocket>>();
 
             if (this.options.BufferManager == null)
-                this.options.BufferManager = BufferManager.CreateBufferManager(100, this.options.SendBufferSize * 2); // create small buffer pool if not configured
+                this.options.BufferManager = BufferManager.CreateBufferManager(this.options.SendBufferSize * 2 * 100, this.options.SendBufferSize * 2); // create small buffer pool if not configured
 
             if (this.options.CertificateValidationHandler == null)
                 this.options.CertificateValidationHandler = this.ValidateRemoteCertificate;
