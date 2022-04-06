@@ -79,14 +79,15 @@ namespace vtortola.WebSockets
                 this.NegotiationTimeout = Timeout.InfiniteTimeSpan;
 
             if (this.SendBufferSize < 1024)
-                throw new WebSocketException($"{nameof(this.SendBufferSize)} must be bigger than 1024. Actual value: {this.SendBufferSize}");
-
-            if (this.BufferManager != null && this.SendBufferSize < this.BufferManager.LargeBufferSize)
             {
-                var sendBufferSizeName = nameof(this.SendBufferSize);
+                throw new WebSocketException($"{nameof(this.SendBufferSize)} must be bigger than 1024. Actual value: {this.SendBufferSize}");
+            }
 
-                throw new WebSocketException(
-                    $"{this.BufferManager}.{this.BufferManager.LargeBufferSize} must be bigger or equals to {sendBufferSizeName}. Actual value of {sendBufferSizeName}: {this.SendBufferSize}");
+            if (this.BufferManager != null && this.SendBufferSize > this.BufferManager.LargeBufferSize)
+            {
+                throw new WebSocketException($"{nameof(WebSocketListenerOptions)}.{nameof(this.BufferManager)}.{nameof(this.BufferManager.LargeBufferSize)}. must be " +
+                    $"bigger or equals to {nameof(WebSocketListenerOptions)}.{nameof(this.SendBufferSize)}. " +
+                    $"Value of {nameof(this.SendBufferSize)}: {this.SendBufferSize}. Value of {nameof(this.BufferManager.LargeBufferSize)}: {this.BufferManager.LargeBufferSize}.");
             }
 
             if (this.Logger == null)
