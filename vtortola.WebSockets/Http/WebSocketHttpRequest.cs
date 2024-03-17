@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Net;
 using vtortola.WebSockets.Http;
 
@@ -31,7 +29,7 @@ namespace vtortola.WebSockets
             this.RemoteEndPoint = NoAddress;
             this.Direction = direction;
         }
-        
+
         internal void SetExtensions(List<WebSocketExtension> extensions)
         {
             if (extensions == null) throw new ArgumentNullException(nameof(extensions));

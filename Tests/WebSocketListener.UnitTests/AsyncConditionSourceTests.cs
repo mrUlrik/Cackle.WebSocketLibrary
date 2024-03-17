@@ -1,31 +1,20 @@
 ﻿using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using vtortola.WebSockets.Async;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace vtortola.WebSockets.UnitTests
 {
     public sealed class AsyncConditionSourceTests
     {
-        private readonly TestLogger logger;
-
-        public AsyncConditionSourceTests(ITestOutputHelper output)
-        {
-            this.logger = new TestLogger(output);
-        }
-
         [Theory]
-        [InlineData(2)]
-        [InlineData(5)]
-        [InlineData(10)]
-        [InlineData(40)]
-        [InlineData(80)]
-        [InlineData(100)]
-        [InlineData(200)]
-        [InlineData(500)]
-        [InlineData(1000)]
+        [TestCase(2)]
+        [TestCase(5)]
+        [TestCase(10)]
+        [TestCase(40)]
+        [TestCase(80)]
+        [TestCase(100)]
+        [TestCase(200)]
+        [TestCase(500)]
+        [TestCase(1000)]
         public async Task ParallelSetContinuationTest(int subscribers)
         {
             var condition = new AsyncConditionSource();
@@ -45,22 +34,22 @@ namespace vtortola.WebSockets.UnitTests
             while (sw.ElapsedMilliseconds < 1000 && subscribers != hits)
                 Thread.Sleep(10);
 
-            this.logger.Debug($"[TEST] subscribers: {subscribers}, hits: {hits}.");
+            TestContext.Out.WriteLine($"[TEST] subscribers: {subscribers}, hits: {hits}.");
 
-            Assert.Equal(subscribers, hits);
+            Assert.That(hits, Is.EqualTo(subscribers));
         }
 
         [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(5)]
-        [InlineData(10)]
-        [InlineData(40)]
-        [InlineData(80)]
-        [InlineData(100)]
-        [InlineData(200)]
-        [InlineData(500)]
-        [InlineData(1000)]
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(5)]
+        [TestCase(10)]
+        [TestCase(40)]
+        [TestCase(80)]
+        [TestCase(100)]
+        [TestCase(200)]
+        [TestCase(500)]
+        [TestCase(1000)]
         public async Task BeforeSetContinuationTest(int subscribers)
         {
             var condition = new AsyncConditionSource(isSet: true);
@@ -78,22 +67,22 @@ namespace vtortola.WebSockets.UnitTests
             while (sw.ElapsedMilliseconds < 1000 && subscribers != hits)
                 Thread.Sleep(10);
 
-            this.logger.Debug($"[TEST] subscribers: {subscribers}, hits: {hits}.");
+            TestContext.Out.WriteLine($"[TEST] subscribers: {subscribers}, hits: {hits}.");
 
-            Assert.Equal(subscribers, hits);
+            Assert.That(hits, Is.EqualTo(subscribers));
         }
 
         [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(5)]
-        [InlineData(10)]
-        [InlineData(40)]
-        [InlineData(80)]
-        [InlineData(100)]
-        [InlineData(200)]
-        [InlineData(500)]
-        [InlineData(1000)]
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(5)]
+        [TestCase(10)]
+        [TestCase(40)]
+        [TestCase(80)]
+        [TestCase(100)]
+        [TestCase(200)]
+        [TestCase(500)]
+        [TestCase(1000)]
         public async Task AfterSetContinuationTest(int subscribers)
         {
             var condition = new AsyncConditionSource(isSet: false);
@@ -113,9 +102,9 @@ namespace vtortola.WebSockets.UnitTests
             while (sw.ElapsedMilliseconds < 1000 && subscribers != hits)
                 Thread.Sleep(10);
 
-            this.logger.Debug($"[TEST] subscribers: {subscribers}, hits: {hits}.");
-            
-            Assert.Equal(subscribers, hits);
+            TestContext.Out.WriteLine($"[TEST] subscribers: {subscribers}, hits: {hits}.");
+
+            Assert.That(hits, Is.EqualTo(subscribers));
         }
     }
 }

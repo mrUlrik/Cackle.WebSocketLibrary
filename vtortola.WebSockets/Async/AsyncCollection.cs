@@ -1,18 +1,13 @@
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Security;
-using System.Threading;
 using vtortola.WebSockets.Tools;
-
-#pragma warning disable 420
 
 namespace vtortola.WebSockets.Async
 {
-    internal abstract class AsyncCollection<ItemT, CollectionT> : IProducerConsumerCollection<ItemT> where CollectionT : class, IProducerConsumerCollection<ItemT>
+    public abstract class AsyncCollection<ItemT, CollectionT> : IProducerConsumerCollection<ItemT> where CollectionT : class, IProducerConsumerCollection<ItemT>
     {
         private static readonly ItemT[] EmptyList = new ItemT[0];
 

@@ -1,17 +1,13 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-#if !NAMED_PIPES_DISABLE
-using System;
-using System.Collections.Generic;
-using System.IO.Pipes;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using vtortola.WebSockets.Transports.Tcp;
 
-#pragma warning disable 420
+using System.IO.Pipes;
+using System.Net.Sockets;
+using System.Net;
+
+#if !NAMED_PIPES_DISABLE
 namespace vtortola.WebSockets.Transports.NamedPipes
 {
     internal sealed class NamedPipeListener : Listener

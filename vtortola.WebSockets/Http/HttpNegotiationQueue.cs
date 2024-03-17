@@ -1,7 +1,5 @@
-using System;
+﻿using System.Net.WebSockets;
 using System.Runtime.ExceptionServices;
-using System.Threading;
-using System.Threading.Tasks;
 using vtortola.WebSockets.Async;
 using vtortola.WebSockets.Tools;
 using vtortola.WebSockets.Transports;

@@ -2,21 +2,13 @@
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Collections.Generic;
-#if DEBUG
-using System.Diagnostics;
-#endif
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 
-// ReSharper disable ConsiderUsingAsyncSuffix
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace vtortola.WebSockets.Tools
 {
-    internal static class TaskHelper
+    public static class TaskHelper
     {
         public static readonly Task CanceledTask;
         public static readonly Task CompletedTask;

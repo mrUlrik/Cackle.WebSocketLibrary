@@ -1,43 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
-        <!--;;netstandard-->
-        <PackageId></PackageId>
-        <Description>http://vtortola.github.io/WebSocketListener</Description>
-        <Company>vtortola</Company>
-        <Product>vtortola.WebSockets</Product>
-        <Version>4.0.0</Version>
-        <Authors>Valeriano Tortola, Denis Zykov</Authors>
-        <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
-        <PackageProjectUrl>https://github.com/vtortola/WebSocketListener</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/vtortola/WebSocketListener</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>websockets HTML5 realtime streaming sockets server async asynchronous</PackageTags>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\WebSocketListener.snk</AssemblyOriginatorKeyFile>
-        <DelaySign>False</DelaySign>
-        <AssemblyVersion>4.0.0.0</AssemblyVersion>
-        <FileVersion>4.0.0.0</FileVersion>
-        <IsPackable>false</IsPackable>
-    </PropertyGroup>
-    <ItemGroup>
-        <None Include="..\WebSocketListener.snk" Link="WebSocketListener.snk" />
-    </ItemGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-        <PackageReference Include="System.Collections" Version="4.3.0" />
-        <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
-        <PackageReference Include="System.Reflection" Version="4.3.0" />
-        <PackageReference Include="System.Reflection.TypeExtensions " Version="4.3.0" />
-        <PackageReference Include="System.Net.Security" Version="4.3.2" />
-        <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Description>http://vtortola.github.io/WebSocketListener</Description>
+    <Company>vtortola</Company>
+    <Authors>Valeriano Tortola, Denis Zykov</Authors>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/vtortola/WebSocketListener</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/vtortola/WebSocketListener.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>websockets HTML5 realtime streaming sockets server async asynchronous</PackageTags>
+    <Version>4.0.0</Version>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-        <DefineConstants>$(DefineConstants);NETSTANDARD;NAMED_PIPES_DISABLE;THREADABORTDUMMY</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
-        <DefineConstants>$(DefineConstants);UAP;NAMED_PIPES_DISABLE;THREADABORTDUMMY</DefineConstants>
-    </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+  </ItemGroup>
+
 </Project>
-

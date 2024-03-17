@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Description>http://vtortola.github.io/WebSocketListener</Description>
+    <Company>vtortola</Company>
+    <Authors>Valeriano Tortola, Denis Zykov</Authors>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/vtortola/WebSocketListener</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/vtortola/WebSocketListener.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>websockets HTML5 realtime streaming sockets server async asynchronous</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+  </ItemGroup>
+
+</Project>

@@ -1,40 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
+using NUnit.Framework.Internal;
 using System.Text;
 using Moq;
-using vtortola.WebSockets;
 using vtortola.WebSockets.Http;
 using vtortola.WebSockets.Rfc6455;
-using Xunit;
-using Xunit.Abstractions;
-
-#pragma warning disable 1998
 
 namespace vtortola.WebSockets.UnitTests
 {
     public class WebSocketHandshakerTests
     {
-        private readonly ILogger logger;
         private readonly WebSocketFactoryCollection factories;
 
-        public WebSocketHandshakerTests(ITestOutputHelper output)
+        public WebSocketHandshakerTests()
         {
-            this.logger = new TestLogger(output);
             this.factories = new WebSocketFactoryCollection();
             this.factories.Add(new WebSocketFactoryRfc6455());
         }
 
-        [Fact]
+        [Test]
         public void DetectReturnCookieErrors()
         {
             var handshaker = new WebSocketHandshaker(this.factories,
                 new WebSocketListenerOptions
                 {
-                    Logger = this.logger,
-                    HttpAuthenticationHandler = async (req, res) =>
+                    Logger = new TestLogger(),
+                    HttpAuthenticationHandler = (req, res) =>
                     {
                         throw new Exception("dummy");
                     }
@@ -74,15 +64,15 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void DoSimpleHandshake()
         {
-            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = this.logger });
+            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = new TestLogger() });
 
             using (var connectionInput = new MemoryStream())
             using (var connectionOutput = new MemoryStream())
@@ -106,13 +96,13 @@ namespace vtortola.WebSockets.UnitTests
                 Assert.NotNull(result);
                 Assert.True((bool)result.IsWebSocketRequest);
                 Assert.True((bool)result.IsVersionSupported);
-                Assert.Equal(new Uri("http://example.com"), new Uri(result.Request.Headers[RequestHeader.Origin]));
-                Assert.Equal((string)"server.example.com", (string)result.Request.Headers[RequestHeader.Host]);
-                Assert.Equal((string)@"/chat", (string)result.Request.RequestUri.ToString());
-                Assert.Equal(1, result.Request.Cookies.Count);
+                Assert.That(new Uri(result.Request.Headers[RequestHeader.Origin]), Is.EqualTo(new Uri("http://example.com")));
+                Assert.That((string)result.Request.Headers[RequestHeader.Host], Is.EqualTo((string)"server.example.com"));
+                Assert.That((string)result.Request.RequestUri.ToString(), Is.EqualTo((string)@"/chat"));
+                Assert.That(result.Request.Cookies.Count, Is.EqualTo(1));
                 var cookie = result.Request.Cookies["key"];
-                Assert.Equal((string)"key", (string)cookie.Name);
-                Assert.Equal((string)@"W9g/8FLW8RAFqSCWBvB9Ag==#5962c0ace89f4f780aa2a53febf2aae5", (string)cookie.Value);
+                Assert.That((string)cookie.Name, Is.EqualTo((string)"key"));
+                Assert.That((string)cookie.Value, Is.EqualTo((string)@"W9g/8FLW8RAFqSCWBvB9Ag==#5962c0ace89f4f780aa2a53febf2aae5"));
 
                 Assert.NotNull(result.Request.LocalEndPoint);
                 Assert.NotNull(result.Request.RemoteEndPoint);
@@ -129,15 +119,15 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void DoSimpleHandshakeWithEndpoints()
         {
-            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = this.logger });
+            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = new TestLogger() });
 
             using (var connectionInput = new MemoryStream())
             using (var connectionOutput = new MemoryStream())
@@ -159,15 +149,15 @@ namespace vtortola.WebSockets.UnitTests
 
                 var result = handshaker.HandshakeAsync(connection).Result;
 
-                Assert.Equal(connection.LocalEndPoint.ToString(), result.Request.LocalEndPoint.ToString());
-                Assert.Equal(connection.RemoteEndPoint.ToString(), result.Request.RemoteEndPoint.ToString());
+                Assert.That(result.Request.LocalEndPoint.ToString(), Is.EqualTo(connection.LocalEndPoint.ToString()));
+                Assert.That(result.Request.RemoteEndPoint.ToString(), Is.EqualTo(connection.RemoteEndPoint.ToString()));
             }
         }
 
-        [Fact]
+        [Test]
         public void DoSimpleHandshakeVerifyCaseInsensitive()
         {
-            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = this.logger });
+            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = new TestLogger() });
 
             using (var connectionInput = new MemoryStream())
             using (var connectionOutput = new MemoryStream())
@@ -191,13 +181,13 @@ namespace vtortola.WebSockets.UnitTests
                 Assert.NotNull(result);
                 Assert.True((bool)result.IsWebSocketRequest);
                 Assert.True((bool)result.IsVersionSupported);
-                Assert.Equal(new Uri("http://example.com"), new Uri(result.Request.Headers[RequestHeader.Origin]));
-                Assert.Equal((string)"server.example.com", (string)result.Request.Headers[RequestHeader.Host]);
-                Assert.Equal((string)@"/chat", (string)result.Request.RequestUri.ToString());
-                Assert.Equal(1, result.Request.Cookies.Count);
+                Assert.That(new Uri(result.Request.Headers[RequestHeader.Origin]), Is.EqualTo(new Uri("http://example.com")));
+                Assert.That((string)result.Request.Headers[RequestHeader.Host], Is.EqualTo((string)"server.example.com"));
+                Assert.That((string)result.Request.RequestUri.ToString(), Is.EqualTo((string)@"/chat"));
+                Assert.That(result.Request.Cookies.Count, Is.EqualTo(1));
                 var cookie = result.Request.Cookies["key"];
-                Assert.Equal((string)"key", (string)cookie.Name);
-                Assert.Equal((string)@"W9g/8FLW8RAFqSCWBvB9Ag==#5962c0ace89f4f780aa2a53febf2aae5", (string)cookie.Value);
+                Assert.That((string)cookie.Name, Is.EqualTo((string)"key"));
+                Assert.That((string)cookie.Value, Is.EqualTo((string)@"W9g/8FLW8RAFqSCWBvB9Ag==#5962c0ace89f4f780aa2a53febf2aae5"));
 
                 connectionOutput.Seek(0, SeekOrigin.Begin);
 
@@ -211,12 +201,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void IndicateANonSupportedVersion()
         {
             var extension = new Mock<IWebSocketMessageExtension>();
@@ -236,7 +226,7 @@ namespace vtortola.WebSockets.UnitTests
             factories.Add(factory);
             var handshaker = new WebSocketHandshaker(factories, new WebSocketListenerOptions
             {
-                Logger = this.logger,
+                Logger = new TestLogger(),
                 SubProtocols = new[]
                 {
                     "superchat"
@@ -278,12 +268,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void IndicateANonWebSocketConnection()
         {
             var extension = new Mock<IWebSocketMessageExtension>();
@@ -303,7 +293,7 @@ namespace vtortola.WebSockets.UnitTests
             factories.Add(factory);
             var handshaker = new WebSocketHandshaker(factories, new WebSocketListenerOptions
             {
-                Logger = this.logger,
+                Logger = new TestLogger(),
                 SubProtocols = new[]
                 {
                     "superchat"
@@ -337,17 +327,17 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void NegotiateAndIgnoreAnExtension()
         {
             var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions
             {
-                Logger = this.logger,
+                Logger = new TestLogger(),
                 SubProtocols = new[]
                 {
                     "superchat"
@@ -377,8 +367,8 @@ namespace vtortola.WebSockets.UnitTests
                 var result = handshaker.HandshakeAsync(connection).Result;
                 Assert.NotNull(result);
                 Assert.True((bool)result.IsWebSocketRequest);
-                Assert.Equal(new Uri("http://example.com"), new Uri(result.Request.Headers[RequestHeader.Origin]));
-                Assert.Equal((string)"superchat", (string)result.Response.Headers[ResponseHeader.WebSocketProtocol]);
+                Assert.That(new Uri(result.Request.Headers[RequestHeader.Origin]), Is.EqualTo(new Uri("http://example.com")));
+                Assert.That((string)result.Response.Headers[ResponseHeader.WebSocketProtocol], Is.EqualTo((string)"superchat"));
 
                 connectionOutput.Seek(0, SeekOrigin.Begin);
 
@@ -393,12 +383,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void NegotiateAnExtension()
         {
             var extension = new Mock<IWebSocketMessageExtension>();
@@ -415,7 +405,7 @@ namespace vtortola.WebSockets.UnitTests
             factories.Add(factory);
             var handshaker = new WebSocketHandshaker(factories, new WebSocketListenerOptions
             {
-                Logger = this.logger,
+                Logger = new TestLogger(),
                 SubProtocols = new[]
                 {
                     "superchat"
@@ -445,8 +435,8 @@ namespace vtortola.WebSockets.UnitTests
                 var result = handshaker.HandshakeAsync(connection).Result;
                 Assert.NotNull(result);
                 Assert.True((bool)result.IsWebSocketRequest);
-                Assert.Equal(new Uri("http://example.com"), new Uri(result.Request.Headers[RequestHeader.Origin]));
-                Assert.Equal((string)"superchat", (string)result.Response.Headers[ResponseHeader.WebSocketProtocol]);
+                Assert.That(new Uri(result.Request.Headers[RequestHeader.Origin]), Is.EqualTo(new Uri("http://example.com")));
+                Assert.That((string)result.Response.Headers[ResponseHeader.WebSocketProtocol], Is.EqualTo((string)"superchat"));
 
                 connectionOutput.Seek(0, SeekOrigin.Begin);
 
@@ -462,12 +452,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void NegotiateAnExtensionWithParameters()
         {
             var extension = new Mock<IWebSocketMessageExtension>();
@@ -487,7 +477,7 @@ namespace vtortola.WebSockets.UnitTests
             factories.Add(factory);
             var handshaker = new WebSocketHandshaker(factories, new WebSocketListenerOptions
             {
-                Logger = this.logger,
+                Logger = new TestLogger(),
                 SubProtocols = new[]
                 {
                     "superchat"
@@ -517,8 +507,8 @@ namespace vtortola.WebSockets.UnitTests
                 var result = handshaker.HandshakeAsync(connection).Result;
                 Assert.NotNull(result);
                 Assert.True((bool)result.IsWebSocketRequest);
-                Assert.Equal(new Uri("http://example.com"), new Uri(result.Request.Headers[RequestHeader.Origin]));
-                Assert.Equal((string)"superchat", (string)result.Response.Headers[ResponseHeader.WebSocketProtocol]);
+                Assert.That(new Uri(result.Request.Headers[RequestHeader.Origin]), Is.EqualTo(new Uri("http://example.com")));
+                Assert.That((string)result.Response.Headers[ResponseHeader.WebSocketProtocol], Is.EqualTo((string)"superchat"));
 
                 connectionOutput.Seek(0, SeekOrigin.Begin);
 
@@ -534,17 +524,17 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void NegotiateASubProtocol()
         {
             var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions
             {
-                Logger = this.logger,
+                Logger = new TestLogger(),
                 SubProtocols = new[]
                 {
                     "superchat"
@@ -573,8 +563,8 @@ namespace vtortola.WebSockets.UnitTests
                 var result = handshaker.HandshakeAsync(connection).Result;
                 Assert.NotNull(result);
                 Assert.True((bool)result.IsWebSocketRequest);
-                Assert.Equal(new Uri("http://example.com"), new Uri(result.Request.Headers[RequestHeader.Origin]));
-                Assert.Equal((string)"superchat", (string)result.Response.Headers[ResponseHeader.WebSocketProtocol]);
+                Assert.That(new Uri(result.Request.Headers[RequestHeader.Origin]), Is.EqualTo(new Uri("http://example.com")));
+                Assert.That((string)result.Response.Headers[ResponseHeader.WebSocketProtocol], Is.EqualTo((string)"superchat"));
 
                 connectionOutput.Seek(0, SeekOrigin.Begin);
 
@@ -589,80 +579,80 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void ParseCookies()
         {
             var parsed = CookieParser.Parse("cookie1=uno").ToArray();
             Assert.NotNull(parsed);
-            Assert.Equal(1, parsed.Length);
-            Assert.Equal("cookie1", parsed[0].Name);
-            Assert.Equal("uno", parsed[0].Value);
+            Assert.That(parsed.Length, Is.EqualTo(1));
+            Assert.That(parsed[0].Name, Is.EqualTo("cookie1"));
+            Assert.That(parsed[0].Value, Is.EqualTo("uno"));
 
             parsed = CookieParser.Parse("cookie1=uno;cookie2=dos").ToArray();
             Assert.NotNull(parsed);
-            Assert.Equal(2, parsed.Length);
-            Assert.Equal("cookie1", parsed[0].Name);
-            Assert.Equal("uno", parsed[0].Value);
-            Assert.Equal("cookie2", parsed[1].Name);
-            Assert.Equal("dos", parsed[1].Value);
+            Assert.That(parsed.Length, Is.EqualTo(2));
+            Assert.That(parsed[0].Name, Is.EqualTo("cookie1"));
+            Assert.That(parsed[0].Value, Is.EqualTo("uno"));
+            Assert.That(parsed[1].Name, Is.EqualTo("cookie2"));
+            Assert.That(parsed[1].Value, Is.EqualTo("dos"));
 
             parsed = CookieParser.Parse("cookie1=uno; cookie2=dos ").ToArray();
             Assert.NotNull(parsed);
-            Assert.Equal(2, parsed.Length);
-            Assert.Equal("cookie1", parsed[0].Name);
-            Assert.Equal("uno", parsed[0].Value);
-            Assert.Equal("cookie2", parsed[1].Name);
-            Assert.Equal("dos", parsed[1].Value);
+            Assert.That(parsed.Length, Is.EqualTo(2));
+            Assert.That(parsed[0].Name, Is.EqualTo("cookie1")); 
+            Assert.That(parsed[0].Value, Is.EqualTo("uno"));
+            Assert.That(parsed[1].Name, Is.EqualTo("cookie2"));
+            Assert.That(parsed[1].Value, Is.EqualTo("dos"));
 
             parsed = CookieParser.Parse("cookie1=uno; cookie2===dos== ").ToArray();
             Assert.NotNull(parsed);
-            Assert.Equal(2, parsed.Length);
-            Assert.Equal("cookie1", parsed[0].Name);
-            Assert.Equal("uno", parsed[0].Value);
-            Assert.Equal("cookie2", parsed[1].Name);
-            Assert.Equal("==dos==", parsed[1].Value);
+            Assert.That(parsed.Length, Is.EqualTo(2));
+            Assert.That(parsed[0].Name, Is.EqualTo("cookie1"));
+            Assert.That(parsed[0].Value, Is.EqualTo("uno"));
+            Assert.That(parsed[1].Name, Is.EqualTo("cookie2"));
+            Assert.That(parsed[1].Value, Is.EqualTo("==dos=="));
 
             parsed = CookieParser
                 .Parse(
                     "language=ru; _ym_uid=1111111111111; _ym_isad=2; __test; settings=%7B%22market_730_onPage%22%3A24%7D; timezoneOffset=10800")
                 .ToArray();
             Assert.NotNull(parsed);
-            Assert.Equal(6, parsed.Length);
-            Assert.Equal("language", parsed[0].Name);
-            Assert.Equal("ru", parsed[0].Value);
-            Assert.Equal("_ym_uid", parsed[1].Name);
-            Assert.Equal("1111111111111", parsed[1].Value);
-            Assert.Equal("_ym_isad", parsed[2].Name);
-            Assert.Equal("2", parsed[2].Value);
-            Assert.Equal("__test", parsed[3].Name);
-            Assert.Equal("", parsed[3].Value);
-            Assert.Equal("settings", parsed[4].Name);
-            Assert.Equal("{\"market_730_onPage\":24}", parsed[4].Value);
-            Assert.Equal("timezoneOffset", parsed[5].Name);
-            Assert.Equal("10800", parsed[5].Value);
+            Assert.That(parsed.Length, Is.EqualTo(6));
+            Assert.That(parsed[0].Name, Is.EqualTo("language"));
+            Assert.That(parsed[0].Value, Is.EqualTo("ru"));
+            Assert.That(parsed[1].Name, Is.EqualTo("_ym_uid"));
+            Assert.That(parsed[1].Value, Is.EqualTo("1111111111111"));
+            Assert.That(parsed[2].Name, Is.EqualTo("_ym_isad"));
+            Assert.That(parsed[2].Value, Is.EqualTo("2"));
+            Assert.That(parsed[3].Name, Is.EqualTo("__test"));
+            Assert.That(parsed[3].Value, Is.EqualTo(""));
+            Assert.That(parsed[4].Name, Is.EqualTo("settings"));
+            Assert.That(parsed[4].Value, Is.EqualTo("{\"market_730_onPage\":24}"));
+            Assert.That(parsed[5].Name, Is.EqualTo("timezoneOffset"));
+            Assert.That(parsed[5].Value, Is.EqualTo("10800"));
 
             parsed = CookieParser.Parse(null).ToArray();
             Assert.NotNull(parsed);
-            Assert.Equal(0, parsed.Length);
+            Assert.That(parsed.Length, Is.EqualTo(0));
 
             parsed = CookieParser.Parse(string.Empty).ToArray();
             Assert.NotNull(parsed);
-            Assert.Equal(0, parsed.Length);
+            Assert.That(parsed.Length, Is.EqualTo(0));
 
             parsed = CookieParser.Parse("   ").ToArray();
             Assert.NotNull(parsed);
-            Assert.Equal(0, parsed.Length);
+            Assert.That(parsed.Length, Is.EqualTo(0));
         }
 
-        [Fact]
+        [Test]
         public void ParseMultipleCookie()
         {
-            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = this.logger });
+            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = new TestLogger() });
 
             using (var connectionInput = new MemoryStream())
             using (var connectionOutput = new MemoryStream())
@@ -685,22 +675,22 @@ namespace vtortola.WebSockets.UnitTests
                 var result = handshaker.HandshakeAsync(connection).Result;
                 Assert.NotNull(result);
 
-                Assert.Equal(2, result.Request.Cookies.Count);
+                Assert.That(result.Request.Cookies.Count, Is.EqualTo(2));
             }
         }
 
-        [Fact]
+        [Test]
         public void ReturnCookies()
         {
             var handshaker = new WebSocketHandshaker(this.factories,
                 new WebSocketListenerOptions
                 {
-                    Logger = this.logger,
-                    HttpAuthenticationHandler = async (request, response) =>
+                    Logger = new TestLogger(),
+                    HttpAuthenticationHandler = (request, response) =>
                     {
                         response.Cookies.Add(new Cookie("name1", "value1"));
                         response.Cookies.Add(new Cookie("name2", "value2"));
-                        return true;
+                        return Task.FromResult(true);
                     }
                 });
 
@@ -739,22 +729,22 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void SendCustomErrorCode()
         {
             var handshaker = new WebSocketHandshaker(this.factories,
                 new WebSocketListenerOptions
                 {
-                    Logger = this.logger,
-                    HttpAuthenticationHandler = async (req, res) =>
+                    Logger = new TestLogger(),
+                    HttpAuthenticationHandler = (req, res) =>
                     {
                         res.Status = HttpStatusCode.Unauthorized;
-                        return false;
+                        return Task.FromResult(false);
                     }
                 });
 
@@ -791,15 +781,15 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void UnderstandEncodedCookies()
         {
-            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = this.logger });
+            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = new TestLogger() });
 
             using (var connectionInput = new MemoryStream())
             using (var connectionOutput = new MemoryStream())
@@ -822,17 +812,17 @@ namespace vtortola.WebSockets.UnitTests
                 var result = handshaker.HandshakeAsync(connection).Result;
                 Assert.NotNull(result);
                 Assert.True((bool)result.IsValidWebSocketRequest);
-                Assert.Equal(1, result.Request.Cookies.Count);
-                Assert.Equal((string)"This is encoded.", (string)result.Request.Cookies["key"].Value);
+                Assert.That(result.Request.Cookies.Count, Is.EqualTo(1));
+                Assert.That((string)result.Request.Cookies["key"].Value, Is.EqualTo((string)"This is encoded."));
             }
         }
 
-        [Fact]
+        [Test]
         public void DoesNotFailWhenSubProtocolRequestedButNoMatch()
         {
             var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions
             {
-                Logger = this.logger,
+                Logger = new TestLogger(),
                 SubProtocols = new[]
                 {
                     "superchat2", "text"
@@ -878,15 +868,15 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void DoNotFailWhenSubProtocolRequestedButNotOffered()
         {
-            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = this.logger });
+            var handshaker = new WebSocketHandshaker(this.factories, new WebSocketListenerOptions { Logger = new TestLogger() });
 
             using (var connectionInput = new MemoryStream())
             using (var connectionOutput = new MemoryStream())
@@ -926,12 +916,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void FailWhenBadRequest()
         {
             var extension = new Mock<IWebSocketMessageExtension>();
@@ -951,7 +941,7 @@ namespace vtortola.WebSockets.UnitTests
             factories.Add(factory);
             var handshaker = new WebSocketHandshaker(factories, new WebSocketListenerOptions
             {
-                Logger = this.logger,
+                Logger = new TestLogger(),
                 SubProtocols = new[]
                 {
                     "superchat"
@@ -990,7 +980,7 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }

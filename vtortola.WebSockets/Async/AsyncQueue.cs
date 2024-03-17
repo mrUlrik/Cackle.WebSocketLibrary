@@ -2,14 +2,12 @@
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System.Collections.Concurrent;
-using System.Threading;
 
-#pragma warning disable 420
+using System.Collections.Concurrent;
 
 namespace vtortola.WebSockets.Async
 {
-    internal sealed class AsyncQueue<ItemT> : AsyncCollection<ItemT, ConcurrentQueue<ItemT>>
+    public sealed class AsyncQueue<ItemT> : AsyncCollection<ItemT, ConcurrentQueue<ItemT>>
     {
         /// <inheritdoc />
         public AsyncQueue(int boundedCapacity = UNBOUND)

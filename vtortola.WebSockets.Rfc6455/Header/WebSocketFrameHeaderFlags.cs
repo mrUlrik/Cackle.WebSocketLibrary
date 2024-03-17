@@ -1,9 +1,10 @@
+﻿using System.Net.WebSockets;
 using System.Text;
 using vtortola.WebSockets.Tools;
 
 namespace vtortola.WebSockets.Rfc6455
 {
-    internal sealed class WebSocketFrameHeaderFlags
+    public sealed class WebSocketFrameHeaderFlags
     {
         private byte _byte1, _byte2;
 

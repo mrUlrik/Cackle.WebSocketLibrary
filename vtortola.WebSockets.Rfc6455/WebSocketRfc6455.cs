@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net;
 using JetBrains.Annotations;
 using vtortola.WebSockets.Http;
 using vtortola.WebSockets.Transports;

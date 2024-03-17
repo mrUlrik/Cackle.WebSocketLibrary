@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace vtortola.WebSockets.Http
+﻿namespace vtortola.WebSockets.Http
 {
     [AttributeUsage(AttributeTargets.Field)]
     internal class HeaderAttribute : Attribute

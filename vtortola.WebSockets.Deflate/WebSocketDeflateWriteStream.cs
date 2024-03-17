@@ -1,7 +1,4 @@
-using System;
-using System.IO.Compression;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.IO.Compression;
 using JetBrains.Annotations;
 
 namespace vtortola.WebSockets.Deflate
@@ -19,9 +16,9 @@ namespace vtortola.WebSockets.Deflate
         private volatile int state = STATE_OPEN;
 
         /// <inheritdoc />
-        internal override WebSocketListenerOptions Options => this.innerStream.Options;
+        public override WebSocketListenerOptions Options => this.innerStream.Options;
 
-        public WebSocketDeflateWriteStream([NotNull]WebSocketMessageWriteStream innerStream)
+        public WebSocketDeflateWriteStream([NotNull] WebSocketMessageWriteStream innerStream)
         {
             if (innerStream == null) throw new ArgumentNullException(nameof(innerStream));
 

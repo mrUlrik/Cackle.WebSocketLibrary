@@ -1,26 +1,15 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading;
+﻿using System.Diagnostics;
 using vtortola.WebSockets.Async;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace vtortola.WebSockets.UnitTests
 {
     public sealed class TimedQueueTests
     {
-        private readonly TestLogger logger;
-
-        public TimedQueueTests(ITestOutputHelper output)
-        {
-            this.logger = new TestLogger(output);
-        }
-
         [Theory]
-        [InlineData(100)]
-        [InlineData(1000)]
-        [InlineData(2000)]
-        [InlineData(3000)]
+        [TestCase(100)]
+        [TestCase(1000)]
+        [TestCase(2000)]
+        [TestCase(3000)]
         public void SubscribeAndDispatch(int milliseconds)
         {
             var sw = Stopwatch.StartNew();
@@ -38,9 +27,9 @@ namespace vtortola.WebSockets.UnitTests
             while (sw.ElapsedMilliseconds < milliseconds && subscriptions != hits)
                 Thread.Sleep(10);
 
-            this.logger.Debug($"[TEST] subscriptions: {subscriptions}, hits: {hits}.");
+            TestContext.Out.WriteLine($"[TEST] subscriptions: {subscriptions}, hits: {hits}.");
 
-            Assert.Equal(subscriptions, hits);
+            Assert.That(hits, Is.EqualTo(subscriptions));
         }
     }
 }

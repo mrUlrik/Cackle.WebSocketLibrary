@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using JetBrains.Annotations;
 
 namespace vtortola.WebSockets

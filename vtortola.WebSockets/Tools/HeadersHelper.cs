@@ -1,12 +1,9 @@
-/*
-	Copyright (c) 2017 Denis Zykov
-	License: https://opensource.org/licenses/MIT
+﻿/*
+    Copyright (c) 2017 Denis Zykov
+    License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Collections.Generic;
+
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using JetBrains.Annotations;
 
 namespace vtortola.WebSockets.Tools
@@ -55,7 +52,7 @@ namespace vtortola.WebSockets.Tools
                 startIndex = nextValueIndex + 1;
             } while (startIndex < valueString.Length);
         }
-        
+
         public static void TrimInPlace([NotNull] string value, ref int startIndex, ref int length)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));

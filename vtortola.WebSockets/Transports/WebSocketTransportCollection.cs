@@ -2,16 +2,11 @@
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
+
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+using vtortola.WebSockets.Transports.NamedPipes;
 using vtortola.WebSockets.Transports.Tcp;
 using vtortola.WebSockets.Transports.UnixSockets;
-#if !NAMED_PIPES_DISABLE
-using vtortola.WebSockets.Transports.NamedPipes;
-#endif
 
 namespace vtortola.WebSockets.Transports
 {
@@ -92,7 +87,6 @@ namespace vtortola.WebSockets.Transports
 
         internal void SetUsed(bool isUsed)
         {
-#pragma warning disable 420
             var newValue = default(int);
             if (isUsed)
                 newValue = Interlocked.Increment(ref this.useCounter);
@@ -100,7 +94,6 @@ namespace vtortola.WebSockets.Transports
                 newValue = Interlocked.Decrement(ref this.useCounter);
             if (newValue < 0)
                 throw new InvalidOperationException("The collection is released more than once.");
-#pragma warning restore 420
         }
 
         public bool TryGetWebSocketTransport(Uri request, out WebSocketTransport transport)

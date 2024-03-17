@@ -1,20 +1,14 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using vtortola.WebSockets.Tools;
 
-#pragma warning disable 420
+using System.Diagnostics;
+using vtortola.WebSockets.Tools;
 
 namespace vtortola.WebSockets.Async
 {
-    internal abstract class NotificationQueue<SubscriptionListT> : IDisposable where SubscriptionListT : class
+    public abstract class NotificationQueue<SubscriptionListT> : IDisposable where SubscriptionListT : class
     {
         // ReSharper disable once StaticMemberInGenericType
         private static readonly double TicksPerStopwatchTick = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;

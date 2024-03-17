@@ -1,7 +1,4 @@
-using System;
-using System.IO.Compression;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.IO.Compression;
 using JetBrains.Annotations;
 using vtortola.WebSockets.Tools;
 
@@ -21,7 +18,7 @@ namespace vtortola.WebSockets.Deflate
         public override WebSocketExtensionFlags Flags => this.innerStream.Flags;
 
         /// <inheritdoc />
-        internal override WebSocketListenerOptions Options => this.innerStream.Options;
+        public override WebSocketListenerOptions Options => this.innerStream.Options;
 
         public WebSocketDeflateReadStream([NotNull] WebSocketMessageReadStream innerStream)
         {

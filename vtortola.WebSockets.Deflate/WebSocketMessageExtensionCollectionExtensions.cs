@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace vtortola.WebSockets.Deflate
+﻿namespace vtortola.WebSockets.Deflate
 {
     public static class WebSocketMessageExtensionCollectionExtensions
     {

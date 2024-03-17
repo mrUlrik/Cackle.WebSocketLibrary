@@ -1,17 +1,11 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
-using vtortola.WebSockets.Tools;
 
-#pragma warning disable 420
+using System.Net.Sockets;
+using System.Net;
+using vtortola.WebSockets.Tools;
 
 namespace vtortola.WebSockets.Transports.Sockets
 {
@@ -143,7 +137,7 @@ namespace vtortola.WebSockets.Transports.Sockets
             var socket = acceptTask.Result;
             try
             {
-                var connection = this.CreateConnection(socket, acceptEndPoint); 
+                var connection = this.CreateConnection(socket, acceptEndPoint);
                 if (this.log.IsDebugEnabled)
                     this.log.Debug($"New socket accepted. Remote address: '{connection.RemoteEndPoint?.ToString() ?? "<null>"}', Local address: '{connection.LocalEndPoint?.ToString() ?? "<null>"}'.");
                 return connection;

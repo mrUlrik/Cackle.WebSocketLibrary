@@ -1,13 +1,6 @@
-using System;
-using System.IO;
-using System.Net;
+﻿using System.Net.WebSockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using vtortola.WebSockets;
 using vtortola.WebSockets.Rfc6455;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace vtortola.WebSockets.UnitTests
 {
@@ -16,9 +9,9 @@ namespace vtortola.WebSockets.UnitTests
         private readonly WebSocketFactoryCollection factories;
         private readonly WebSocketListenerOptions options;
 
-        public WebSocketTests(ITestOutputHelper output)
+        public WebSocketTests()
         {
-            var logger = new TestLogger(output);
+            var logger = new TestLogger();
             this.factories = new WebSocketFactoryCollection();
             this.factories.Add(new WebSocketFactoryRfc6455());
             this.options = new WebSocketListenerOptions
@@ -55,7 +48,7 @@ namespace vtortola.WebSockets.UnitTests
             }
         }
 
-        [Fact]
+        [Test]
         public void DetectHalfOpenConnection()
         {
             var handshake = this.GenerateSimpleHandshake();
@@ -68,7 +61,7 @@ namespace vtortola.WebSockets.UnitTests
             using (var ws = new WebSocketRfc6455(connection, options, handshake.Request,
                 handshake.Response, handshake.NegotiatedMessageExtensions))
             {
-                ws.ReadMessageAsync(CancellationToken.None);
+                ws.ReadMessageAsync(CancellationToken.None).Wait();
 
                 // DateTime has no millisecond precision. 
                 Thread.Sleep(500);
@@ -76,7 +69,7 @@ namespace vtortola.WebSockets.UnitTests
             }
         }
 
-        [Fact]
+        [Test]
         public void ReadEmptyMessage()
         {
             var handshake = this.GenerateSimpleHandshake();
@@ -97,12 +90,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(string.Empty, s);
+                    Assert.That(s, Is.EqualTo(string.Empty));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void ReadEmptyMessagesFollowedWithNonEmptyMessage()
         {
             var handshake = this.GenerateSimpleHandshake();
@@ -122,7 +115,7 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(string.Empty, s);
+                    Assert.That(s, Is.EqualTo(string.Empty));
                 }
 
                 reader = ws.ReadMessageAsync(CancellationToken.None).Result;
@@ -130,7 +123,7 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(string.Empty, s);
+                    Assert.That(s, Is.EqualTo(string.Empty));
                 }
 
                 reader = ws.ReadMessageAsync(CancellationToken.None).Result;
@@ -138,12 +131,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal("Hi", s);
+                    Assert.That(s, Is.EqualTo("Hi"));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void ReadSmallFrame()
         {
             var handshake = this.GenerateSimpleHandshake();
@@ -161,7 +154,7 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal("Hi", s);
+                    Assert.That(s, Is.EqualTo("Hi"));
                 }
 
                 connectionInput.Seek(0, SeekOrigin.Begin);
@@ -174,12 +167,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEndAsync().Result;
-                    Assert.Equal("Hi", s);
+                    Assert.That(s, Is.EqualTo("Hi"));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void ReadThreeSmallPartialFrames()
         {
             var handshake = this.GenerateSimpleHandshake();
@@ -199,12 +192,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal("HiHiHi", s);
+                    Assert.That(s, Is.EqualTo("HiHiHi"));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void ReadTwoBufferedSmallFrames()
         {
             var handshake = this.GenerateSimpleHandshake();
@@ -223,7 +216,7 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal("Hi", s);
+                    Assert.That(s, Is.EqualTo("Hi"));
                 }
 
                 reader = ws.ReadMessageAsync(CancellationToken.None).Result;
@@ -231,7 +224,7 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEndAsync().Result;
-                    Assert.Equal("Hi", s);
+                    Assert.That(s, Is.EqualTo("Hi"));
                 }
 
                 reader = ws.ReadMessageAsync(CancellationToken.None).Result;
@@ -239,7 +232,7 @@ namespace vtortola.WebSockets.UnitTests
             }
         }
 
-        [Fact]
+        [Test]
         public void ReadTwoSmallPartialFrames()
         {
             var handshake = this.GenerateSimpleHandshake();
@@ -258,12 +251,12 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(reader, Encoding.UTF8, true, 1024, true))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal("HiHi", s);
+                    Assert.That(s, Is.EqualTo("HiHi"));
                 }
             }
         }
 
-        [Fact]
+        [Test]
         public void WriteTwoSequentialMessages()
         {
             var handshake = this.GenerateSimpleHandshake();
@@ -284,11 +277,11 @@ namespace vtortola.WebSockets.UnitTests
             }
         }
 
-        [Fact]
-        public async Task FailDoubleMessageAwait()
+        [Test]
+        public Task FailDoubleMessageAwait()
         {
             var handshake = this.GenerateSimpleHandshake();
-            await Assert.ThrowsAsync<WebSocketException>(async () =>
+            var result = Assert.ThrowsAsync<WebSocketException>(async () =>
             {
                 using (var connectionInput = new BufferedStream(new MemoryStream()))
                 using (var connectionOutput = new MemoryStream())
@@ -303,14 +296,16 @@ namespace vtortola.WebSockets.UnitTests
                     await ws.ReadMessageAsync(CancellationToken.None).ConfigureAwait(false);
                     await ws.ReadMessageAsync(CancellationToken.None).ConfigureAwait(false);
                 }
-            }).ConfigureAwait(false);
+            });
+
+            return Task.FromResult(result);
         }
 
-        [Fact]
-        public async Task FailDoubleMessageRead()
+        [Test]
+        public Task FailDoubleMessageRead()
         {
             var handshake = this.GenerateSimpleHandshake();
-            await Assert.ThrowsAsync<WebSocketException>(async () =>
+            var result = Assert.ThrowsAsync<WebSocketException>(async () =>
             {
                 using (var connectionInput = new MemoryStream())
                 using (var connectionOutput = new MemoryStream())
@@ -327,10 +322,12 @@ namespace vtortola.WebSockets.UnitTests
                     reader = await ws.ReadMessageAsync(CancellationToken.None).ConfigureAwait(false);
                     Assert.NotNull(reader);
                 }
-            }).ConfigureAwait(false);
+            });
+
+            return Task.FromResult(result);
         }
 
-        [Fact]
+        [Test]
         public void FailDoubleMessageWrite()
         {
             var handshake = this.GenerateSimpleHandshake();

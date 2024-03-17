@@ -1,21 +1,17 @@
-/*
-	Copyright (c) 2017 Denis Zykov
-	License: https://opensource.org/licenses/MIT
+﻿/*
+    Copyright (c) 2017 Denis Zykov
+    License: https://opensource.org/licenses/MIT
 */
-using System;
+
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Security;
-using System.Threading;
 using JetBrains.Annotations;
 using vtortola.WebSockets.Tools;
 
-// disable Warning	"a reference to a volatile field will not be treated as volatile"
-#pragma warning disable 420
-
 namespace vtortola.WebSockets.Async
 {
-    internal sealed class AsyncConditionSource
+    public sealed class AsyncConditionSource
     {
         public struct Awaiter : ICriticalNotifyCompletion
         {
@@ -73,7 +69,7 @@ namespace vtortola.WebSockets.Async
 
         private Action safeContinuation;
         private Action unsafeContinuation;
-        
+
         public bool ContinueOnCapturedContext { get; set; }
         public bool Schedule { get; set; }
 

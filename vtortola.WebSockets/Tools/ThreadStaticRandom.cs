@@ -1,12 +1,11 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
 
 namespace vtortola.WebSockets.Tools
 {
-    internal sealed class ThreadStaticRandom
+    public sealed class ThreadStaticRandom
     {
         [ThreadStatic]
         private static Random instance;

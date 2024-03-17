@@ -1,7 +1,4 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using vtortola.WebSockets.Tools;
 
 namespace vtortola.WebSockets.Rfc6455
@@ -19,7 +16,7 @@ namespace vtortola.WebSockets.Rfc6455
         public override WebSocketMessageType MessageType { get; }
         public override WebSocketExtensionFlags Flags { get; }
         /// <inheritdoc />
-        internal override WebSocketListenerOptions Options => this._webSocket.Connection.Options;
+        public override WebSocketListenerOptions Options => this._webSocket.Connection.Options;
 
         public WebSocketMessageReadRfc6455Stream([NotNull] WebSocketRfc6455 webSocket)
         {
@@ -32,7 +29,7 @@ namespace vtortola.WebSockets.Rfc6455
             this.MessageType = (WebSocketMessageType)headerOptions;
             this.Flags = GetExtensionFlags(_webSocket.Connection.CurrentHeader.Flags);
             _hasPendingFrames = !_webSocket.Connection.CurrentHeader.Flags.FIN;
-            
+
             if (headerOptions != WebSocketFrameOption.Binary &&
                 headerOptions != WebSocketFrameOption.Text)
             {
@@ -94,7 +91,7 @@ namespace vtortola.WebSockets.Rfc6455
                         await LoadNewHeaderAsync(cancellationToken).ConfigureAwait(false);
                 }
             } while (read == 0 && _webSocket.Connection.CurrentHeader.RemainingBytes > 0 && count > 0);
-            
+
             return totalRead;
         }
 

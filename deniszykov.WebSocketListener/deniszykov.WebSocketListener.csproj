@@ -121,9 +121,6 @@ UNIX Domain Sockets are tested on Linux</PackageReleaseNotes>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Include="..\WebSocketListener.snk" Link="WebSocketListener.snk" />
-	</ItemGroup>
-	<ItemGroup>
 		<ProjectReference Include="..\vtortola.WebSockets.Deflate\vtortola.WebSockets.Deflate.csproj">
 			<PrivateAssets>All</PrivateAssets>
 		</ProjectReference>
@@ -149,9 +146,6 @@ UNIX Domain Sockets are tested on Linux</PackageReleaseNotes>
 			<ILRepack Condition="'$(ILRepack)' == ''">$(NuGetPackageRoot)ilrepack\2.1.0-beta1\tools\ILRepack.exe</ILRepack>
 			<ILRepackTargetPlatform Condition="'$(TargetFramework)' == 'net45'">v4,$(FrameworkPath)</ILRepackTargetPlatform>
 			<ILRepackTargetPlatform Condition="'$(TargetFramework)' == 'netstandard1.3'">v4</ILRepackTargetPlatform>
-			<WSLSignKey>$(ProjectDir)../WebSocketListener.snk</WSLSignKey>
-		</PropertyGroup>		
-		<Exec Command="&quot;$(ILRepack)&quot; /target:library &quot;/targetplatform:$(ILRepackTargetPlatform)&quot; &quot;/keyfile:$(WSLSignKey)&quot; /xmldocs /union /parallel &quot;/out:$(TargetPath)&quot; &quot;$(TargetPath)&quot; &quot;$(TargetDir)vtortola.WebSockets.Deflate.dll&quot; &quot;$(TargetDir)vtortola.WebSockets.dll&quot; &quot;$(TargetDir)vtortola.WebSockets.Rfc6455.dll&quot;" WorkingDirectory="$(ProjectDir)" />
-		<Delete Files="$(TargetDir)vtortola.WebSockets.Deflate.dll;$(TargetDir)vtortola.WebSockets.dll;$(TargetDir)vtortola.WebSockets.Rfc6455.dll" />
+		</PropertyGroup>
 	</Target>
 </Project>

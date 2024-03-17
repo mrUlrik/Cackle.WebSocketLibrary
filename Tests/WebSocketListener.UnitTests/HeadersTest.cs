@@ -1,31 +1,28 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
+﻿using System.Collections.Specialized;
 using vtortola.WebSockets.Http;
-using Xunit;
 
 namespace vtortola.WebSockets.UnitTests
 {
     public class HeadersTest
     {
         [Theory,
-        InlineData("Host:This is MyHost", "Host", new[] { "This is MyHost" }),
-        InlineData(" Host:This is MyHost  ", "Host", new[] { "This is MyHost" }),
-        InlineData(" Host :This is MyHost", "Host", new[] { "This is MyHost" }),
-        InlineData(" Host : This is MyHost", "Host", new[] { "This is MyHost" }),
-        InlineData(" Host  :  This is MyHost", "Host", new[] { "This is MyHost" }),
-        InlineData(" Host  :  This is MyHost ", "Host", new[] { "This is MyHost" }),
-        InlineData(" Host  :  This is MyHost   ", "Host", new[] { "This is MyHost" }),
-        InlineData("  Host  :  This is MyHost   ", "Host", new[] { "This is MyHost" }),
-        InlineData("  Host  :  This is , MyHost   ", "Host", new[] { "This is , MyHost" }), // host is atomic header and should be split
-        InlineData("MyCustomHeader:MyValue1,MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
-        InlineData("MyCustomHeader: MyValue1,MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
-        InlineData("MyCustomHeader: MyValue1 ,MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
-        InlineData("MyCustomHeader: MyValue1, MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
-        InlineData("MyCustomHeader: MyValue1 , MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
-        InlineData("MyCustomHeader: MyValue1 , MyValue2 ", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
-        InlineData("MyCustomHeader: MyValue1 , MyValue2  ", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
-        InlineData("MyCustomHeader: MyValue1 , MyValue2 , MyValue3", "MyCustomHeader", new[] { "MyValue1", "MyValue2", "MyValue3" }),
+        TestCase("Host:This is MyHost", "Host", new[] { "This is MyHost" }),
+        TestCase(" Host:This is MyHost  ", "Host", new[] { "This is MyHost" }),
+        TestCase(" Host :This is MyHost", "Host", new[] { "This is MyHost" }),
+        TestCase(" Host : This is MyHost", "Host", new[] { "This is MyHost" }),
+        TestCase(" Host  :  This is MyHost", "Host", new[] { "This is MyHost" }),
+        TestCase(" Host  :  This is MyHost ", "Host", new[] { "This is MyHost" }),
+        TestCase(" Host  :  This is MyHost   ", "Host", new[] { "This is MyHost" }),
+        TestCase("  Host  :  This is MyHost   ", "Host", new[] { "This is MyHost" }),
+        TestCase("  Host  :  This is , MyHost   ", "Host", new[] { "This is , MyHost" }), // host is atomic header and should be split
+        TestCase("MyCustomHeader:MyValue1,MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
+        TestCase("MyCustomHeader: MyValue1,MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
+        TestCase("MyCustomHeader: MyValue1 ,MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
+        TestCase("MyCustomHeader: MyValue1, MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
+        TestCase("MyCustomHeader: MyValue1 , MyValue2", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
+        TestCase("MyCustomHeader: MyValue1 , MyValue2 ", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
+        TestCase("MyCustomHeader: MyValue1 , MyValue2  ", "MyCustomHeader", new[] { "MyValue1", "MyValue2" }),
+        TestCase("MyCustomHeader: MyValue1 , MyValue2 , MyValue3", "MyCustomHeader", new[] { "MyValue1", "MyValue2", "MyValue3" }),
         ]
         public void TryParseAndAddRequestHeaderTest(string header, string expectedKey, string[] expectedValues)
         {
@@ -34,19 +31,19 @@ namespace vtortola.WebSockets.UnitTests
             headers.TryParseAndAdd(header);
             var actualValues = headers.GetValues(expectedKey).ToArray();
 
-            Assert.Equal(expectedValues, actualValues);
+            Assert.That(actualValues, Is.EqualTo(expectedValues));
         }
 
-        [Fact]
+        [Test]
         public void ClearTest()
         {
             // clear filled
             var dict = new Headers<RequestHeader>();
             dict.Set(RequestHeader.Accept, "value");
             dict.Set("Custom1", "value");
-            Assert.Equal(2, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(2));
             dict.Clear();
-            Assert.Equal(0, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(0));
             Assert.False(dict.Contains(RequestHeader.Accept));
             Assert.False(dict.Contains("Accept"));
             Assert.False(dict.Contains("Custom1"));
@@ -64,7 +61,7 @@ namespace vtortola.WebSockets.UnitTests
             dict.Set(RequestHeader.Trailer, "value");
             dict.Remove(RequestHeader.Trailer);
             dict.Clear();
-            Assert.Equal(0, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(0));
             Assert.False(dict.Contains(RequestHeader.Trailer));
 
             // clear cleared
@@ -72,7 +69,7 @@ namespace vtortola.WebSockets.UnitTests
             dict.Clear();
             dict.Clear();
         }
-        [Fact]
+        [Test]
         public void ConstructorTest()
         {
             // empty
@@ -88,9 +85,9 @@ namespace vtortola.WebSockets.UnitTests
                     "Via", "Value2"
                 }
             });
-            Assert.Equal(2, dict2.Count);
-            Assert.Equal(dict2["Custom"], "Value1");
-            Assert.Equal(dict2[RequestHeader.Via], "Value2");
+            Assert.That(dict2.Count, Is.EqualTo(2));
+            Assert.That(dict2["Custom"], Is.EqualTo("Value1"));
+            Assert.That(dict2[RequestHeader.Via], Is.EqualTo("Value2"));
 
             // dictionary
             var dict3 = new Headers<RequestHeader>(new Dictionary<string, string>
@@ -102,11 +99,11 @@ namespace vtortola.WebSockets.UnitTests
                     "Via", "Value2"
                 }
             });
-            Assert.Equal(dict3["Custom"], "Value1");
-            Assert.Equal(dict3[RequestHeader.Via], "Value2");
+            Assert.That(dict3["Custom"], Is.EqualTo("Value1"));
+            Assert.That(dict3[RequestHeader.Via], Is.EqualTo("Value2"));
         }
 
-        [Fact]
+        [Test]
         public void ContainsTest()
         {
             // contains known
@@ -157,7 +154,7 @@ namespace vtortola.WebSockets.UnitTests
             Assert.False(coll.Contains(new KeyValuePair<string, string>("Custom1", "value1")), "contains(key,value) failed");
         }
 
-        [Fact]
+        [Test]
         public void EnumerateTest()
         {
             // enum new/missing/existing known
@@ -168,7 +165,7 @@ namespace vtortola.WebSockets.UnitTests
             knownDict.Set(RequestHeader.Te, "te header");
             knownDict.Remove(RequestHeader.Te);
 
-            Assert.Equal(2, knownDict.Count);
+            Assert.That(knownDict.Count, Is.EqualTo(2));
 
             // enum new/missing/existing custom
             var custDict = new Headers<RequestHeader>();
@@ -178,12 +175,12 @@ namespace vtortola.WebSockets.UnitTests
             custDict.Set("Custom3", "value3");
             custDict.Remove("Custom3");
 
-            Assert.Equal(2, custDict.Count);
+            Assert.That(custDict.Count, Is.EqualTo(2));
 
             // enum empty
             var dict = new Headers<RequestHeader>();
 
-            Assert.Equal(0, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(0));
 
             // get allkeys
             dict = new Headers<RequestHeader>();
@@ -205,11 +202,11 @@ namespace vtortola.WebSockets.UnitTests
                 "via", "trailer", "value1", "value2"
             };
 
-            Assert.Contains(expectedKeys, allKeys.Contains);
-            Assert.Contains(expectedValues, allValues.Contains);
+            Assert.That(expectedKeys, Has.All.Contains(allKeys));
+            Assert.That(expectedValues, Has.All.Contains(allValues));
         }
 
-        [Fact]
+        [Test]
         public void GetSetTest()
         {
             // set new/existing known
@@ -217,20 +214,20 @@ namespace vtortola.WebSockets.UnitTests
             var dict = new Headers<RequestHeader>();
 
             dict.Set(RequestHeader.Trailer, "value");
-            Assert.Equal(1, dict.Count);
-            Assert.Equal(dict[RequestHeader.Trailer], "value");
+            Assert.That(dict.Count, Is.EqualTo(1));
+            Assert.That(dict[RequestHeader.Trailer], Is.EqualTo("value"));
             Assert.False(dict.Contains(RequestHeader.AcceptCharset));
 
             dict.Set(RequestHeader.Trailer, "value2");
-            Assert.Equal(1, dict.Count);
-            Assert.Equal(dict[RequestHeader.Trailer], "value2");
+            Assert.That(dict.Count, Is.EqualTo(1));
+            Assert.That(dict[RequestHeader.Trailer], Is.EqualTo("value2"));
             Assert.False(dict.Contains(RequestHeader.AcceptCharset));
 
             dict.Set(RequestHeader.Trailer, "valueA");
             dict.Set(RequestHeader.Via, "valueB");
-            Assert.Equal(2, dict.Count);
-            Assert.Equal(dict[RequestHeader.Trailer], "valueA");
-            Assert.Equal(dict[RequestHeader.Via], "valueB");
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict[RequestHeader.Trailer], Is.EqualTo("valueA"));
+            Assert.That(dict[RequestHeader.Via], Is.EqualTo("valueB"));
             Assert.False(dict.Contains(RequestHeader.AcceptCharset));
 
             // set new/existing custom
@@ -238,23 +235,23 @@ namespace vtortola.WebSockets.UnitTests
             dict = new Headers<RequestHeader>();
 
             dict.Set("Custom1", "value");
-            Assert.Equal(1, dict.Count);
-            Assert.Equal(dict["Custom1"], "value");
+            Assert.That(dict.Count, Is.EqualTo(1));
+            Assert.That(dict["Custom1"], Is.EqualTo("value"));
 
             dict.Set("Custom1", "value2");
-            Assert.Equal(1, dict.Count);
-            Assert.Equal(dict["Custom1"], "value2");
+            Assert.That(dict.Count, Is.EqualTo(1));
+            Assert.That(dict["Custom1"], Is.EqualTo("value2"));
 
             dict.Set("Custom1", "valueA");
             dict.Set("Custom2", "valueB");
-            Assert.Equal(2, dict.Count);
-            Assert.Equal(dict["Custom1"], "valueA");
-            Assert.Equal(dict["Custom2"], "valueB");
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict["Custom1"], Is.EqualTo("valueA"));
+            Assert.That(dict["Custom2"], Is.EqualTo("valueB"));
             Assert.False(dict.Contains("Custom3"));
 
             // get missing/existing custom case-insensitive
-            Assert.Equal(dict["custom1"], "valueA");
-            Assert.Equal(dict["custom2"], "valueB");
+            Assert.That(dict["custom1"], Is.EqualTo("valueA"));
+            Assert.That(dict["custom2"], Is.EqualTo("valueB"));
             Assert.False(dict.Contains("custom3"));
 
             // set new/existing mixed
@@ -262,53 +259,53 @@ namespace vtortola.WebSockets.UnitTests
             dict = new Headers<RequestHeader>();
             dict.Set("Custom1", "value");
             dict.Set(RequestHeader.Trailer, "value");
-            Assert.Equal(2, dict.Count);
-            Assert.Equal(dict["Custom1"], "value");
-            Assert.Equal(dict[RequestHeader.Trailer], "value");
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict["Custom1"], Is.EqualTo("value"));
+            Assert.That(dict[RequestHeader.Trailer], Is.EqualTo("value"));
 
             dict.Set("Custom1", "value2");
             dict.Set(RequestHeader.Trailer, "value2");
-            Assert.Equal(2, dict.Count);
-            Assert.Equal(dict["Custom1"], "value2");
-            Assert.Equal(dict[RequestHeader.Trailer], "value2");
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict["Custom1"], Is.EqualTo("value2"));
+            Assert.That(dict[RequestHeader.Trailer], Is.EqualTo("value2"));
 
             dict.Set("Custom1", "valueA");
             dict.Set("Custom2", "valueB");
             dict.Set(RequestHeader.Trailer, "valueA");
             dict.Set(RequestHeader.Via, "valueB");
-            Assert.Equal(4, dict.Count);
-            Assert.Equal(dict[RequestHeader.Trailer], "valueA");
-            Assert.Equal(dict[RequestHeader.Via], "valueB");
-            Assert.Equal(dict["Custom1"], "valueA");
-            Assert.Equal(dict["Custom2"], "valueB");
+            Assert.That(dict.Count, Is.EqualTo(4));
+            Assert.That(dict[RequestHeader.Trailer], Is.EqualTo("valueA"));
+            Assert.That(dict[RequestHeader.Via], Is.EqualTo("valueB"));
+            Assert.That(dict["Custom1"], Is.EqualTo("valueA"));
+            Assert.That(dict["Custom2"], Is.EqualTo("valueB"));
 
             // get missing/existing mixed case-insensitive
-            Assert.Equal(dict["custom1"], "valueA");
-            Assert.Equal(dict["custom2"], "valueB");
-            Assert.Equal(dict["trailer"], "valueA");
-            Assert.Equal(dict["via"], "valueB");
+            Assert.That(dict["custom1"], Is.EqualTo("valueA"));
+            Assert.That(dict["custom2"], Is.EqualTo("valueB"));
+            Assert.That(dict["trailer"], Is.EqualTo("valueA"));
+            Assert.That(dict["via"], Is.EqualTo("valueB"));
 
             // get empty
             dict = new Headers<RequestHeader>();
-            Assert.Equal(0, dict.Count);
-            Assert.Equal(dict.Get(RequestHeader.Via), "");
-            Assert.Equal(dict.Get("Via"), "");
-            Assert.Equal(dict.Get("Custom"), "");
+            Assert.That(dict.Count, Is.EqualTo(0));
+            Assert.That(dict.Get(RequestHeader.Via), Is.EqualTo(""));
+            Assert.That(dict.Get("Via"), Is.EqualTo(""));
+            Assert.That(dict.Get("Custom"), Is.EqualTo(""));
             Assert.False(dict.Contains(RequestHeader.Via));
             Assert.False(dict.Contains("Via"));
             Assert.False(dict.Contains("Custom"));
         }
 
-        [Fact]
+        [Test]
         public void RemoveTest()
         {
             // remove new/missing/existing known
             var dict = new Headers<RequestHeader>();
             dict.Set(RequestHeader.Accept, "value");
-            Assert.Equal(1, dict.Count);
-            Assert.Equal("value", dict[RequestHeader.Accept]);
+            Assert.That(dict.Count, Is.EqualTo(1));
+            Assert.That(dict[RequestHeader.Accept], Is.EqualTo("value"));
             dict.Remove(RequestHeader.Accept);
-            Assert.Equal(0, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(0));
             Assert.False(dict.Contains(RequestHeader.Accept));
 
             //  remove missing value
@@ -318,19 +315,19 @@ namespace vtortola.WebSockets.UnitTests
             //  remove modified value
             dict.Set(RequestHeader.Accept, "value");
             dict.Set("accept", "value2");
-            Assert.Equal(1, dict.Count);
-            Assert.Equal("value2", dict[RequestHeader.Accept]);
+            Assert.That(dict.Count, Is.EqualTo(1));
+            Assert.That(dict[RequestHeader.Accept], Is.EqualTo("value2"));
             dict.Remove(RequestHeader.Accept);
-            Assert.Equal(0, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(0));
             Assert.False(dict.Contains(RequestHeader.Accept));
 
             // remove new/missing/existing custom
             dict = new Headers<RequestHeader>();
             dict.Set("Custom1", "value");
-            Assert.Equal(1, dict.Count);
-            Assert.Equal("value", dict["Custom1"]);
+            Assert.That(dict.Count, Is.EqualTo(1));
+            Assert.That(dict["Custom1"], Is.EqualTo("value"));
             dict.Remove("Custom1");
-            Assert.Equal(0, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(0));
             Assert.False(dict.Contains("Custom1"));
 
             //  remove missing value
@@ -340,22 +337,22 @@ namespace vtortola.WebSockets.UnitTests
             //  remove modified value
             dict.Set("Custom1", "value");
             dict.Set("Custom1", "value2");
-            Assert.Equal(1, dict.Count);
-            Assert.Equal("value2", dict["Custom1"]);
+            Assert.That(dict.Count, Is.EqualTo(1));
+            Assert.That(dict["Custom1"], Is.EqualTo("value2"));
             dict.Remove("Custom1");
-            Assert.Equal(0, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(0));
             Assert.False(dict.Contains("Custom1"));
 
             // remove new/missing/existing mixed
             dict = new Headers<RequestHeader>();
             dict.Set("Custom1", "value");
             dict.Set(RequestHeader.Accept, "value");
-            Assert.Equal(2, dict.Count);
-            Assert.Equal("value", dict["Custom1"]);
-            Assert.Equal("value", dict[RequestHeader.Accept]);
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict["Custom1"], Is.EqualTo("value"));
+            Assert.That(dict[RequestHeader.Accept], Is.EqualTo("value"));
             dict.Remove("Custom1");
             dict.Remove(RequestHeader.Accept);
-            Assert.Equal(0, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(0));
             Assert.False(dict.Contains("Custom1"));
             Assert.False(dict.Contains(RequestHeader.Accept));
 
@@ -370,12 +367,12 @@ namespace vtortola.WebSockets.UnitTests
             dict.Set("Custom1", "value2");
             dict.Set(RequestHeader.Accept, "value");
             dict.Set(RequestHeader.Accept, "value2");
-            Assert.Equal(2, dict.Count);
-            Assert.Equal("value2", dict["Custom1"]);
-            Assert.Equal("value2", dict[RequestHeader.Accept]);
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict["Custom1"], Is.EqualTo("value2"));
+            Assert.That(dict[RequestHeader.Accept], Is.EqualTo("value2"));
             dict.Remove("Custom1");
             dict.Remove(RequestHeader.Accept);
-            Assert.Equal(0, dict.Count);
+            Assert.That(dict.Count, Is.EqualTo(0));
             Assert.False(dict.Contains("Custom1"));
             Assert.False(dict.Contains(RequestHeader.Accept));
 

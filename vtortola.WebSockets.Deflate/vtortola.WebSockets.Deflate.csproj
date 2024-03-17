@@ -1,38 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
-        <Description>http://vtortola.github.io/WebSocketListener</Description>
-        <Company>vtortola</Company>
-        <Product>vtortola.WebSockets.Deflate</Product>
-        <Version>4.0.0</Version>
-        <Authors>Valeriano Tortola</Authors>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\WebSocketListener.snk</AssemblyOriginatorKeyFile>
-        <DelaySign>False</DelaySign>
-        <PackageId></PackageId>
-        <IsPackable>false</IsPackable>
-    </PropertyGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\vtortola.WebSockets\vtortola.WebSockets.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="..\WebSocketListener.snk" Link="WebSocketListener.snk" />
-    </ItemGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-        <PackageReference Include="System.Collections" Version="4.3.0" />
-        <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
-        <PackageReference Include="System.Reflection" Version="4.3.0" />
-        <PackageReference Include="System.Reflection.TypeExtensions " Version="4.3.0" />
-        <PackageReference Include="System.Net.Security" Version="4.3.2" />
-        <PackageReference Include="System.Net.NameResolution" Version="4.3.0" /> 
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Company>vtortola</Company>
+    <Product>vtortola.WebSockets.Deflate</Product>
+    <Authors>Valeriano Tortola</Authors>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-        <DefineConstants>$(DefineConstants);NETSTANDARD;NAMED_PIPES_DISABLE;THREADABORTDUMMY</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
-        <DefineConstants>$(DefineConstants);UAP;NAMED_PIPES_DISABLE;THREADABORTDUMMY</DefineConstants>
-    </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\vtortola.WebSockets\vtortola.WebSockets.csproj" />
+  </ItemGroup>
+
 </Project>
-

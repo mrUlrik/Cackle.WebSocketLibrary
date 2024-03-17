@@ -1,10 +1,10 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Net;
+
 using System.Net.Sockets;
+using System.Net;
 using vtortola.WebSockets.Transports.Sockets;
 
 namespace vtortola.WebSockets.Transports.Tcp
@@ -51,13 +51,6 @@ namespace vtortola.WebSockets.Transports.Tcp
             get { return this.socket.SendTimeout; }
             set { this.socket.SendTimeout = value; }
         }
-#if !NETSTANDARD && !UAP
-        public bool IsAsync
-        {
-            get { return this.socket.UseOnlyOverlappedIO; }
-            set { this.socket.UseOnlyOverlappedIO = value; }
-        }
-#endif
 
         /// <inheritdoc />
         public TcpConnection(Socket socket, EndPoint localEndPoint) : base(socket, localEndPoint)

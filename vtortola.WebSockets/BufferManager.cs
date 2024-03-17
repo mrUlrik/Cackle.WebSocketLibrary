@@ -1,16 +1,14 @@
-/*
-	Copyright (c) 2017 Denis Zykov
-	License: https://opensource.org/licenses/MIT
+﻿/*
+    Copyright (c) 2017 Denis Zykov
+    License: https://opensource.org/licenses/MIT
 */
-using System;
+
 using JetBrains.Annotations;
 
 namespace vtortola.WebSockets
 {
     public abstract class BufferManager
     {
-        [Obsolete("Is not used")]
-        public abstract int SmallBufferSize { get; }
         public abstract int LargeBufferSize { get; }
 
         /// <summary>
@@ -27,7 +25,7 @@ namespace vtortola.WebSockets
             if (maxBufferSize < 0) throw new ArgumentOutOfRangeException(nameof(maxBufferSize));
             if (maxBufferSize < 256) maxBufferSize = 256;
             if (maxBufferPoolSize < maxBufferSize) maxBufferPoolSize = maxBufferSize * 10;
-            
+
             var largeBufferSize = (int)Math.Pow(2, Math.Ceiling(Math.Log(maxBufferSize) / Math.Log(2))); // find nearest bigger power of two
             var largePoolSizeLimit = (int)Math.Max(2, Math.Ceiling(maxBufferPoolSize / 2.0f / largeBufferSize)); // take half of maxMemory as large buffers
             var smallBufferSize = Math.Max(32, largeBufferSize / 256); // small buffer is 256 times less than large buffer
@@ -53,15 +51,9 @@ namespace vtortola.WebSockets
             if (largeBufferSize < 0) throw new ArgumentOutOfRangeException(nameof(largeBufferSize));
             if (smallBufferPoolSize < 0) throw new ArgumentOutOfRangeException(nameof(smallBufferPoolSize));
             if (largeBufferPoolSize < 0) throw new ArgumentOutOfRangeException(nameof(largeBufferPoolSize));
-            
+
             return new DefaultBufferManager(smallBufferSize, smallBufferPoolSize, largeBufferSize, largeBufferPoolSize);
         }
-
-        /// <summary>
-        /// Releases the buffers currently cached in the manager.
-        /// </summary>
-        [Obsolete("Is not used")]
-        public abstract void Clear();
 
         /// <summary>
         /// Returns a buffer to the pool.

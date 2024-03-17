@@ -1,14 +1,11 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-#if !NAMED_PIPES_DISABLE
-using System;
-using System.Collections.Generic;
-using System.IO.Pipes;
-using System.Threading;
-using System.Threading.Tasks;
 
+using System.IO.Pipes;
+
+#if !NAMED_PIPES_DISABLE
 namespace vtortola.WebSockets.Transports.NamedPipes
 {
     public sealed class NamedPipeTransport : WebSocketTransport

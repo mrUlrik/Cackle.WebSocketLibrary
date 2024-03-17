@@ -1,18 +1,14 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
+
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Security;
+using System.Net.WebSockets;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using vtortola.WebSockets.Async;
 using vtortola.WebSockets.Extensibility;

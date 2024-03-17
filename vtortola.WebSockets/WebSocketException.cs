@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace vtortola.WebSockets
+﻿namespace vtortola.WebSockets
 {
     public class WebSocketException : Exception
     {
@@ -9,7 +7,7 @@ namespace vtortola.WebSockets
         {
         }
         public WebSocketException(string message, Exception inner)
-            :base(message,inner)
+            : base(message, inner)
         {
         }
     }

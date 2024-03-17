@@ -1,13 +1,10 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Collections.Concurrent;
-using System.Threading;
-using JetBrains.Annotations;
 
-#pragma warning disable 420
+using System.Collections.Concurrent;
+using JetBrains.Annotations;
 
 namespace vtortola.WebSockets.Tools
 {

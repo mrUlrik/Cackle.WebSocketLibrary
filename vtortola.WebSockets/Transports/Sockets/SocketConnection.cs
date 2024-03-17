@@ -1,19 +1,12 @@
-/*
-	Copyright (c) 2017 Denis Zykov
-	License: https://opensource.org/licenses/MIT
+﻿/*
+    Copyright (c) 2017 Denis Zykov
+    License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
+
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
-using vtortola.WebSockets;
+using System.Net;
 using vtortola.WebSockets.Tools;
 using vtortola.WebSockets.Transports.UnixSockets;
-
-#pragma warning disable 420
 
 namespace vtortola.WebSockets.Transports.Sockets
 {
@@ -47,7 +40,6 @@ namespace vtortola.WebSockets.Transports.Sockets
 
         public SocketConnection(Socket socket, EndPoint localEndPoint)
         {
-#pragma warning disable 168 // unused local variable
             if (socket == null) throw new ArgumentNullException(nameof(socket));
 
             this.closeState = STATE_OPEN;
@@ -86,7 +78,6 @@ namespace vtortola.WebSockets.Transports.Sockets
                 socketEvent.Completed += this.OnSocketOperationCompleted;
                 this.socketEvents[i] = socketEvent;
             }
-#pragma warning restore 168
         }
 
         /// <inheritdoc />

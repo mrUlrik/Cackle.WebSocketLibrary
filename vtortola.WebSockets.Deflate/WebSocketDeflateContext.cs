@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace vtortola.WebSockets.Deflate
+﻿namespace vtortola.WebSockets.Deflate
 {
     public sealed class WebSocketDeflateContext : IWebSocketMessageExtensionContext
     {

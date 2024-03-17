@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace vtortola.WebSockets.Rfc6455
+﻿namespace vtortola.WebSockets.Rfc6455
 {
     public static class WebSocketFactoryCollectionExtensions
     {

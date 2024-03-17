@@ -1,8 +1,4 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using vtortola.WebSockets.Rfc6455.Header;
 using vtortola.WebSockets.Tools;
 using vtortola.WebSockets.Transports;

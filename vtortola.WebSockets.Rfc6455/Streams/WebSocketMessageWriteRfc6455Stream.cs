@@ -1,11 +1,4 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using vtortola.WebSockets.Tools;
-
-#pragma warning disable 420
-
-namespace vtortola.WebSockets.Rfc6455
+﻿namespace vtortola.WebSockets.Rfc6455
 {
     internal class WebSocketMessageWriteRfc6455Stream : WebSocketMessageWriteStream
     {
@@ -22,7 +15,7 @@ namespace vtortola.WebSockets.Rfc6455
         private readonly WebSocketMessageType messageType;
 
         /// <inheritdoc />
-        internal override WebSocketListenerOptions Options => this.webSocket.Connection.Options;
+        public override WebSocketListenerOptions Options => this.webSocket.Connection.Options;
 
         public WebSocketMessageWriteRfc6455Stream(WebSocketRfc6455 webSocket, WebSocketMessageType messageType)
         {

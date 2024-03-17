@@ -1,10 +1,8 @@
-using System;
-using System.Threading;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace vtortola.WebSockets
 {
-    internal static class SafeEnd
+    public static class SafeEnd
     {
         public static void Dispose<T>([CanBeNull] T disposable, ILogger log = null) where T : class, IDisposable
         {

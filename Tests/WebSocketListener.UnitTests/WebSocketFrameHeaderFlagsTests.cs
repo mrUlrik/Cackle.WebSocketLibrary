@@ -1,6 +1,5 @@
-using System.Collections;
+﻿using System.Collections;
 using vtortola.WebSockets.Rfc6455;
-using Xunit;
 
 namespace vtortola.WebSockets.UnitTests
 {
@@ -38,7 +37,7 @@ namespace vtortola.WebSockets.UnitTests
             return byteHead;
         }
 
-        [Fact]
+        [Test]
         public void Parse()
         {
             var header = GenerateHeader(true, false, false, false, false, false, false, true, false);

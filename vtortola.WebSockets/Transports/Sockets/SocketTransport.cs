@@ -1,12 +1,11 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Net;
+
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Net.WebSockets;
+using System.Net;
 using vtortola.WebSockets.Async;
 using vtortola.WebSockets.Transports.UnixSockets;
 
@@ -17,7 +16,7 @@ namespace vtortola.WebSockets.Transports.Sockets
         public const int DEFAULT_BACKLOG_SIZE = 5;
 
         public int BacklogSize { get; set; } = DEFAULT_BACKLOG_SIZE;
-        
+
         protected abstract EndPoint GetRemoteEndPoint(Uri address);
         protected abstract ProtocolType GetProtocolType(Uri address, EndPoint remoteEndPoint);
         protected virtual void SetupClientSocket(Socket socket, EndPoint remoteEndPoint)

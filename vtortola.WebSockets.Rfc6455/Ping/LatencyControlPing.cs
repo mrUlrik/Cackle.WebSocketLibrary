@@ -1,7 +1,4 @@
-using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using vtortola.WebSockets.Rfc6455.Header;
 
 namespace vtortola.WebSockets.Rfc6455

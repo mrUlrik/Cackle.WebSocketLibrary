@@ -1,16 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using JetBrains.Annotations;
 using vtortola.WebSockets.Http;
 
 namespace vtortola.WebSockets
 {
-    internal class WebSocketHandshake : IComparable<WebSocketHandshake>, IEquatable<WebSocketHandshake>
+    public class WebSocketHandshake : IComparable<WebSocketHandshake>, IEquatable<WebSocketHandshake>
     {
         private static long LastId = 1;
 

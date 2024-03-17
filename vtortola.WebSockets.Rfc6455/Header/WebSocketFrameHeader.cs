@@ -1,10 +1,9 @@
-using System;
-using System.Diagnostics;
+﻿using System.Net.WebSockets;
 using vtortola.WebSockets.Rfc6455.Header;
 
 namespace vtortola.WebSockets.Rfc6455
 {
-    internal sealed class WebSocketFrameHeader
+    public sealed class WebSocketFrameHeader
     {
         public uint MaskKey;
         private int cursor;

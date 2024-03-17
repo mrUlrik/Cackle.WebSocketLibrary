@@ -1,14 +1,12 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Collections.Generic;
-using System.Net;
+
 using System.Net.Sockets;
-using System.Threading.Tasks;
-using vtortola.WebSockets.Tools;
+using System.Net;
 using vtortola.WebSockets.Transports.Sockets;
+using vtortola.WebSockets.Tools;
 
 namespace vtortola.WebSockets.Transports.Tcp
 {
@@ -24,9 +22,6 @@ namespace vtortola.WebSockets.Transports.Tcp
         public const bool DEFAULT_NO_DELAY = false;
         public const bool DEFAULT_IS_ASYNC = true;
         public const bool DEFAULT_DUAL_MODE = false;
-#if !NETSTANDARD && !UAP
-        public const IPProtectionLevel DEFAULT_IP_PROTECTION_LEVEL = IPProtectionLevel.Unspecified;
-#endif
 
         private static readonly string[] SupportedSchemes = { "tcp", "ws", "wss" };
 
@@ -37,10 +32,6 @@ namespace vtortola.WebSockets.Transports.Tcp
         public int SendBufferSize { get; set; } = DEFAULT_SEND_BUFFER_SIZE;
         public TimeSpan SendTimeout { get; set; } = TimeSpan.FromMilliseconds(DEFAULT_SEND_TIMEOUT_MS);
         public bool DualMode { get; set; } = DEFAULT_DUAL_MODE;
-#if !NETSTANDARD && !UAP
-        public IPProtectionLevel IpProtectionLevel { get; set; } = DEFAULT_IP_PROTECTION_LEVEL;
-        public bool IsAsync { get; set; } = DEFAULT_IS_ASYNC;
-#endif
 
         /// <inheritdoc />
         public override IReadOnlyCollection<string> Schemes => SupportedSchemes;
@@ -115,13 +106,6 @@ namespace vtortola.WebSockets.Transports.Tcp
             socket.ReceiveTimeout = (int)this.ReceiveTimeout.TotalMilliseconds + 1;
             socket.SendBufferSize = this.SendBufferSize;
             socket.SendTimeout = (int)this.SendTimeout.TotalMilliseconds + 1;
-#if !NETSTANDARD && !UAP
-            if (this.IpProtectionLevel != IPProtectionLevel.Unspecified)
-            {
-                socket.SetIPProtectionLevel(this.IpProtectionLevel);
-            }
-            socket.UseOnlyOverlappedIO = this.IsAsync;
-#endif
         }
     }
 }

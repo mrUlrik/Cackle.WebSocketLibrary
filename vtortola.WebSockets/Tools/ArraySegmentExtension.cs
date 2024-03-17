@@ -2,11 +2,10 @@
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
 
 namespace vtortola.WebSockets.Tools
 {
-    internal static class ArraySegmentExtension
+    public static class ArraySegmentExtension
     {
         public static ArraySegment<T> NextSegment<T>(this ArraySegment<T> segment, int segmentSize)
         {

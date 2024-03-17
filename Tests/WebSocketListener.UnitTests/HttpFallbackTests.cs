@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using NUnit.Framework.Internal;
 using System.Text;
 using Moq;
-using vtortola.WebSockets;
 using vtortola.WebSockets.Http;
 using vtortola.WebSockets.Rfc6455;
 using vtortola.WebSockets.Transports;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace vtortola.WebSockets.UnitTests
 {
@@ -19,9 +15,9 @@ namespace vtortola.WebSockets.UnitTests
         private readonly WebSocketFactoryCollection factories;
         private readonly ILogger logger;
 
-        public HttpFallbackTests(ITestOutputHelper output)
+        public HttpFallbackTests()
         {
-            this.logger = new TestLogger(output);
+            this.logger = new TestLogger();
             this.factories = new WebSocketFactoryCollection();
             this.factories.Add(new WebSocketFactoryRfc6455());
 
@@ -31,7 +27,7 @@ namespace vtortola.WebSockets.UnitTests
             this.postedConnections = new List<Tuple<IHttpRequest, NetworkConnection>>();
         }
 
-        [Fact]
+        [Test]
         public void HttpFallback()
         {
             var options = new WebSocketListenerOptions { Logger = this.logger };
@@ -58,19 +54,19 @@ namespace vtortola.WebSockets.UnitTests
                 Assert.False((bool)result.IsValidWebSocketRequest);
                 Assert.True((bool)result.IsValidHttpRequest);
                 Assert.False((bool)result.IsVersionSupported);
-                Assert.Equal(new Uri("http://example.com"), new Uri(result.Request.Headers[RequestHeader.Origin]));
-                Assert.Equal((string)"server.example.com", (string)result.Request.Headers[RequestHeader.Host]);
-                Assert.Equal((string)@"/chat", (string)result.Request.RequestUri.ToString());
-                Assert.Equal(1, result.Request.Cookies.Count);
+                Assert.That(new Uri(result.Request.Headers[RequestHeader.Origin]), Is.EqualTo(new Uri("http://example.com")));
+                Assert.That((string)result.Request.Headers[RequestHeader.Host], Is.EqualTo((string)"server.example.com"));
+                Assert.That((string)result.Request.RequestUri.ToString(), Is.EqualTo((string)@"/chat"));
+                Assert.That(result.Request.Cookies.Count, Is.EqualTo(1));
                 var cookie = result.Request.Cookies["key"];
-                Assert.Equal((string)"key", (string)cookie.Name);
-                Assert.Equal((string)@"W9g/8FLW8RAFqSCWBvB9Ag==#5962c0ace89f4f780aa2a53febf2aae5", (string)cookie.Value);
+                Assert.That((string)cookie.Name, Is.EqualTo((string)"key"));
+                Assert.That((string)cookie.Value, Is.EqualTo((string)@"W9g/8FLW8RAFqSCWBvB9Ag==#5962c0ace89f4f780aa2a53febf2aae5"));
                 Assert.NotNull(result.Request.LocalEndPoint);
                 Assert.NotNull(result.Request.RemoteEndPoint);
             }
         }
 
-        [Fact]
+        [Test]
         public void SimpleHandshakeIgnoringFallback()
         {
             var options = new WebSocketListenerOptions { Logger = this.logger };
@@ -99,13 +95,13 @@ namespace vtortola.WebSockets.UnitTests
                 Assert.NotNull(result);
                 Assert.True((bool)result.IsWebSocketRequest);
                 Assert.True((bool)result.IsVersionSupported);
-                Assert.Equal(new Uri("http://example.com"), new Uri(result.Request.Headers[RequestHeader.Origin]));
-                Assert.Equal((string)"server.example.com", (string)result.Request.Headers[RequestHeader.Host]);
-                Assert.Equal((string)@"/chat", (string)result.Request.RequestUri.ToString());
-                Assert.Equal(1, result.Request.Cookies.Count);
+                Assert.That(new Uri(result.Request.Headers[RequestHeader.Origin]), Is.EqualTo(new Uri("http://example.com")));
+                Assert.That((string)result.Request.Headers[RequestHeader.Host], Is.EqualTo((string)"server.example.com"));
+                Assert.That((string)result.Request.RequestUri.ToString(), Is.EqualTo((string)@"/chat"));
+                Assert.That(result.Request.Cookies.Count, Is.EqualTo(1));
                 var cookie = result.Request.Cookies["key"];
-                Assert.Equal((string)"key", (string)cookie.Name);
-                Assert.Equal((string)@"W9g/8FLW8RAFqSCWBvB9Ag==#5962c0ace89f4f780aa2a53febf2aae5", (string)cookie.Value);
+                Assert.That((string)cookie.Name, Is.EqualTo((string)"key"));
+                Assert.That((string)cookie.Value, Is.EqualTo((string)@"W9g/8FLW8RAFqSCWBvB9Ag==#5962c0ace89f4f780aa2a53febf2aae5"));
                 Assert.NotNull(result.Request.LocalEndPoint);
                 Assert.NotNull(result.Request.RemoteEndPoint);
 
@@ -121,7 +117,7 @@ namespace vtortola.WebSockets.UnitTests
                 using (var sr = new StreamReader(connectionOutput))
                 {
                     var s = sr.ReadToEnd();
-                    Assert.Equal(sb.ToString(), s);
+                    Assert.That(s, Is.EqualTo(sb.ToString()));
                 }
             }
         }

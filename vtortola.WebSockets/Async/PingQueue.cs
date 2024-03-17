@@ -1,11 +1,9 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Threading;
-using vtortola.WebSockets.Tools;
 
+using vtortola.WebSockets.Tools;
 using PingSubscriptionList = System.Collections.Concurrent.ConcurrentBag<vtortola.WebSockets.WebSocket>;
 
 namespace vtortola.WebSockets.Async
@@ -39,7 +37,7 @@ namespace vtortola.WebSockets.Async
                     await webSocket.SendPingAsync(null, 0, 0).ConfigureAwait(false);
                 }
                 catch (Exception pingError)
-                {                    
+                {
                     if (webSocket.IsConnected && pingError is ObjectDisposedException == false && pingError is ThreadAbortException == false)
                         DebugLogger.Instance.Warning("An error occurred while sending ping.", pingError);
                 }

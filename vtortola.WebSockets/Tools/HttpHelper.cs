@@ -1,15 +1,15 @@
-/*
-	Copyright (c) 2017 Denis Zykov
-	License: https://opensource.org/licenses/MIT
+﻿/*
+    Copyright (c) 2017 Denis Zykov
+    License: https://opensource.org/licenses/MIT
 */
-using System;
+
 using System.Globalization;
 using System.Net;
 using JetBrains.Annotations;
 
 namespace vtortola.WebSockets.Tools
 {
-    internal static class HttpHelper
+    public static class HttpHelper
     {
         public static readonly string WebSocketHttp10Version = "HTTP/1.0";
         public static readonly string WebSocketHttp11Version = "HTTP/1.1";

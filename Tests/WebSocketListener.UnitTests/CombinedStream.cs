@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace vtortola.WebSockets.UnitTests
+﻿namespace vtortola.WebSockets.UnitTests
 {
     public sealed class CombinedStream : Stream
     {

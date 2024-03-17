@@ -1,8 +1,5 @@
-using System;
-using System.Net.Security;
-using System.Net.Sockets;
+﻿using System.Net.Security;
 using System.Security.Authentication;
-using System.Threading;
 using JetBrains.Annotations;
 using vtortola.WebSockets.Transports;
 
@@ -53,7 +50,7 @@ namespace vtortola.WebSockets
             this.HttpAuthenticationHandler = null;
             this.CertificateValidationHandler = null;
             this.PingMode = PingMode.LatencyControl;
-            this.SupportedSslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
+            this.SupportedSslProtocols = SslProtocols.Tls12;
 #if DEBUG
             this.Logger = DebugLogger.Instance;
 #else

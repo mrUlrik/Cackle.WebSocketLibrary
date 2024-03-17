@@ -1,12 +1,9 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
+
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using vtortola.WebSockets.Tools;
 
 namespace vtortola.WebSockets.Rfc6455
 {
@@ -50,7 +47,7 @@ namespace vtortola.WebSockets.Rfc6455
 
                 var messageType = (WebSocketMessageType)WebSocketFrameOption.Ping;
                 var count = this.pingBuffer.Array[this.pingBuffer.Offset];
-                var payload = this.pingBuffer.Skip(1);
+                var payload = this.pingBuffer.Skip(1).ToArray();
 
                 // manual pinging is always enforces sending ping frames
                 var pingFrame = this.connection.PrepareFrame(payload, count, true, false, messageType, WebSocketExtensionFlags.None);

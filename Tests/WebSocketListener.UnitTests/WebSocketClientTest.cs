@@ -1,28 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using vtortola.WebSockets.Deflate;
+﻿using vtortola.WebSockets.Deflate;
 using vtortola.WebSockets.Rfc6455;
 using vtortola.WebSockets.Transports.NamedPipes;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace vtortola.WebSockets.UnitTests
 {
     public class WebSocketClientTest
     {
-        private readonly TestLogger logger;
-
-        public WebSocketClientTest(ITestOutputHelper output)
-        {
-            this.logger = new TestLogger(output);
-        }
-
-        [Fact]
+        [Test]
         public void ConstructTest()
         {
-            var options = new WebSocketListenerOptions() { Logger = this.logger };
+            var options = new WebSocketListenerOptions() { Logger = new TestLogger() };
             options.Standards.RegisterRfc6455();
             var webSocketClient = new WebSocketClient(options);
 
@@ -30,14 +17,14 @@ namespace vtortola.WebSockets.UnitTests
         }
 
         [Theory]
-        [InlineData("ws://echo.websocket.org?encoding=text", 15)]
-        [InlineData("wss://echo.websocket.org?encoding=text", 15)]
+        [TestCase("ws://echo.websocket.org?encoding=text", 15)]
+        [TestCase("wss://echo.websocket.org?encoding=text", 15)]
         public async Task RemoteConnectToServerAsync(string address, int timeoutSeconds)
         {
             var options = new WebSocketListenerOptions()
             {
                 NegotiationTimeout = TimeSpan.FromSeconds(20),
-                Logger = new TestLogger(this.logger) { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached },
+                Logger = new TestLogger() { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached },
             };
             options.Standards.RegisterRfc6455();
             var webSocketClient = new WebSocketClient(options);
@@ -53,10 +40,10 @@ namespace vtortola.WebSockets.UnitTests
         }
 
         [Theory]
-        [InlineData("ws://echo.websocket.org/?encoding=text", 15, new[] { "a test message" })]
-        [InlineData("ws://echo.websocket.org/?encoding=text", 15, new[] { "a test message", "a second message" })]
-        [InlineData("wss://echo.websocket.org?encoding=text", 15, new[] { "a test message" })]
-        [InlineData("wss://echo.websocket.org?encoding=text", 15, new[] { "a test message", "a second message" })]
+        [TestCase("ws://echo.websocket.org/?encoding=text", 15, new[] { "a test message" })]
+        [TestCase("ws://echo.websocket.org/?encoding=text", 15, new[] { "a test message", "a second message" })]
+        [TestCase("wss://echo.websocket.org?encoding=text", 15, new[] { "a test message" })]
+        [TestCase("wss://echo.websocket.org?encoding=text", 15, new[] { "a test message", "a second message" })]
         public async Task RemoteEchoServerAsync(string address, int timeoutSeconds, string[] messages)
         {
             var timeout = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
@@ -64,7 +51,7 @@ namespace vtortola.WebSockets.UnitTests
             var options = new WebSocketListenerOptions
             {
                 NegotiationTimeout = TimeSpan.FromSeconds(20),
-                Logger = new TestLogger(this.logger) { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached }
+                Logger = new TestLogger() { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached }
             };
             options.Standards.RegisterRfc6455();
             var webSocketClient = new WebSocketClient(options);
@@ -81,7 +68,7 @@ namespace vtortola.WebSockets.UnitTests
                 foreach (var message in messages)
                 {
                     await webSocket.WriteStringAsync(message, cancellation).ConfigureAwait(false);
-                    this.logger.Debug("[CLIENT] -> " + message);
+                    TestContext.Out.WriteLine("[CLIENT] -> " + message);
                     await Task.Delay(100).ConfigureAwait(false);
                 }
 
@@ -90,9 +77,9 @@ namespace vtortola.WebSockets.UnitTests
                     var actualMessage = await webSocket.ReadStringAsync(cancellation).ConfigureAwait(false);
                     if (actualMessage == null && !webSocket.IsConnected) throw new InvalidOperationException("Connection is closed!");
 
-                    this.logger.Debug("[CLIENT] <- " + (actualMessage ?? "<null>"));
+                    TestContext.Out.WriteLine("[CLIENT] <- " + (actualMessage ?? "<null>"));
                     Assert.NotNull(actualMessage);
-                    Assert.Equal(expectedMessage, actualMessage);
+                    Assert.That(actualMessage, Is.EqualTo(expectedMessage));
                 }
 
                 await webSocket.CloseAsync().ConfigureAwait(false);
@@ -105,19 +92,19 @@ namespace vtortola.WebSockets.UnitTests
         }
 
         [Theory]
-        [InlineData("tcp://localhost:10000/", 15, new[] { "a test message" })]
-        [InlineData("tcp://localhost:10001/", 15, new[] { "a test message", "a second message" })]
-        [InlineData("tcp://127.0.0.1:10002/", 15, new[] { "a test message" })]
-        [InlineData("tcp://127.0.0.1:10003/", 15, new[] { "a test message", "a second message" })]
-        [InlineData("pipe://testpipe/", 15, new[] { "a test message" })]
-        [InlineData("pipe://testpipe1/", 15, new[] { "a test message", "a second message" })]
+        [TestCase("tcp://localhost:10000/", 15, new[] { "a test message" })]
+        [TestCase("tcp://localhost:10001/", 15, new[] { "a test message", "a second message" })]
+        [TestCase("tcp://127.0.0.1:10002/", 15, new[] { "a test message" })]
+        [TestCase("tcp://127.0.0.1:10003/", 15, new[] { "a test message", "a second message" })]
+        [TestCase("pipe://testpipe/", 15, new[] { "a test message" })]
+        [TestCase("pipe://testpipe1/", 15, new[] { "a test message", "a second message" })]
         public async Task EchoServerAsync(string address, int timeoutSeconds, string[] messages)
         {
             var maxClients = 1;
             var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds)).Token;
             var options = new WebSocketListenerOptions
             {
-                Logger = new TestLogger(this.logger) { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached }
+                Logger = new TestLogger() { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached }
             };
             options.Standards.RegisterRfc6455(rfc6455 =>
             {
@@ -128,40 +115,40 @@ namespace vtortola.WebSockets.UnitTests
             var listenEndPoints = new[] { new Uri(address) };
             var server = new EchoServer(listenEndPoints, options);
 
-            this.logger.Debug("[TEST] Starting echo server.");
+            TestContext.Out.WriteLine("[TEST] Starting echo server.");
             await server.StartAsync().ConfigureAwait(false);
 
             var messageSender = new MessageSender(listenEndPoints[0], options);
-            this.logger.Debug("[TEST] Connecting clients.");
+            TestContext.Out.WriteLine("[TEST] Connecting clients.");
             await messageSender.ConnectAsync(maxClients, cancellation).ConfigureAwait(false);
-            this.logger.Debug($"[TEST] {messageSender.ConnectedClients} Client connected.");
-            this.logger.Debug($"[TEST] Sending {maxClients * messages.Length} messages.");
+            TestContext.Out.WriteLine($"[TEST] {messageSender.ConnectedClients} Client connected.");
+            TestContext.Out.WriteLine($"[TEST] Sending {maxClients * messages.Length} messages.");
             var sendTask = messageSender.SendMessagesAsync(messages, cancellation);
             while (sendTask.IsCompleted == false)
             {
                 await Task.Delay(1000);
-                this.logger.Debug($"[TEST] Server: r={server.ReceivedMessages}, s={server.SentMessages}, e={server.Errors}. " +
+                TestContext.Out.WriteLine($"[TEST] Server: r={server.ReceivedMessages}, s={server.SentMessages}, e={server.Errors}. " +
                     $"Clients: r={messageSender.MessagesReceived}, s={messageSender.MessagesSent}, e={messageSender.Errors}.");
             }
             var processedMessages = await sendTask.ConfigureAwait(false);
-            Assert.Equal(messages.Length, processedMessages);
+            Assert.That(processedMessages, Is.EqualTo(messages.Length));
 
-            this.logger.Debug("[TEST] Stopping echo server.");
+            TestContext.Out.WriteLine("[TEST] Stopping echo server.");
             await server.StopAsync().ConfigureAwait(false);
-            this.logger.Debug("[TEST] Echo server stopped.");
-            this.logger.Debug("[TEST] Disconnecting clients.");
+            TestContext.Out.WriteLine("[TEST] Echo server stopped.");
+            TestContext.Out.WriteLine("[TEST] Disconnecting clients.");
             await messageSender.CloseAsync().ConfigureAwait(false);
-            this.logger.Debug("[TEST] Disposing server.");
+            TestContext.Out.WriteLine("[TEST] Disposing server.");
             server.Dispose();
 
-            this.logger.Debug("[TEST] Waiting for send/receive completion.");
+            TestContext.Out.WriteLine("[TEST] Waiting for send/receive completion.");
         }
 
         [Theory]
-        [InlineData("tcp://127.0.0.1:10100/", 10, 10)]
-        [InlineData("tcp://127.0.0.1:10101/", 20, 100)]
-        //[InlineData("tcp://127.0.0.1:10102/", 30, 1000)]
-        //[InlineData("tcp://127.0.0.1:10103/", 40, 10000)]
+        [TestCase("tcp://127.0.0.1:10100/", 10, 10)]
+        [TestCase("tcp://127.0.0.1:10101/", 20, 100)]
+        //[TestCase("tcp://127.0.0.1:10102/", 30, 1000)]
+        //[TestCase("tcp://127.0.0.1:10103/", 40, 10000)]
         public async Task EchoServerMassClientsAsync(string address, int timeoutSeconds, int maxClients)
         {
             var messages = new string[] { new string('a', 126), new string('a', 127), new string('a', 128), new string('a', ushort.MaxValue - 1), new string('a', ushort.MaxValue), new string('a', ushort.MaxValue + 2) };
@@ -171,12 +158,11 @@ namespace vtortola.WebSockets.UnitTests
             {
                 NegotiationQueueCapacity = maxClients,
                 PingTimeout = TimeSpan.FromSeconds(30),
-                Logger = new TestLogger(this.logger) { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached }
+                Logger = new TestLogger() { IsDebugEnabled = System.Diagnostics.Debugger.IsAttached }
             };
             options.Standards.RegisterRfc6455();
             options.Transports.ConfigureTcp(tcp =>
             {
-                tcp.IsAsync = true;
                 tcp.NoDelay = false;
                 tcp.BacklogSize = maxClients;
                 tcp.SendTimeout = TimeSpan.FromSeconds(15);
@@ -186,19 +172,19 @@ namespace vtortola.WebSockets.UnitTests
             var listenEndPoints = new[] { new Uri(address) };
             var server = new EchoServer(listenEndPoints, options);
 
-            this.logger.Debug("[TEST] Starting echo server.");
+            TestContext.Out.WriteLine("[TEST] Starting echo server.");
             await server.StartAsync().ConfigureAwait(false);
 
             var messageSender = new MessageSender(listenEndPoints[0], options);
-            this.logger.Debug("[TEST] Connecting clients.");
+            TestContext.Out.WriteLine("[TEST] Connecting clients.");
             await messageSender.ConnectAsync(maxClients, cancellation).ConfigureAwait(false);
-            this.logger.Debug($"[TEST] {messageSender.ConnectedClients} Client connected.");
-            this.logger.Debug($"[TEST] Sending {maxClients * messages.Length} messages.");
+            TestContext.Out.WriteLine($"[TEST] {messageSender.ConnectedClients} Client connected.");
+            TestContext.Out.WriteLine($"[TEST] Sending {maxClients * messages.Length} messages.");
             var sendTask = messageSender.SendMessagesAsync(messages, cancellation);
             while (sendTask.IsCompleted == false && cancellation.IsCancellationRequested == false)
             {
                 await Task.Delay(1000);
-                this.logger.Debug($"[TEST] T:{timeoutSeconds - (DateTime.UtcNow - startTime).TotalSeconds:F0} " +
+                TestContext.Out.WriteLine($"[TEST] T:{timeoutSeconds - (DateTime.UtcNow - startTime).TotalSeconds:F0} " +
                     $"Server: r={server.ReceivedMessages}, s={server.SentMessages}, e={server.Errors}. " +
                     $"Clients: r={messageSender.MessagesReceived}, s={messageSender.MessagesSent}, e={messageSender.Errors}.");
             }
@@ -209,9 +195,9 @@ namespace vtortola.WebSockets.UnitTests
 
             if (errorMessages.Count > 0)
             {
-                this.logger.Debug("Errors:");
+                TestContext.Out.WriteLine("Errors:");
                 foreach (var kv in errorMessages)
-                    this.logger.Debug($"[TEST] [x{kv.Value}] {kv.Key}");
+                    TestContext.Out.WriteLine($"[TEST] [x{kv.Value}] {kv.Key}");
             }
 
 
@@ -219,17 +205,17 @@ namespace vtortola.WebSockets.UnitTests
                 throw new TimeoutException();
 
             var processedMessages = await sendTask.ConfigureAwait(false);
-            Assert.Equal(messages.Length * maxClients, processedMessages);
+            Assert.That(processedMessages, Is.EqualTo(messages.Length * maxClients));
 
-            this.logger.Debug("[TEST] Stopping echo server.");
+            TestContext.Out.WriteLine("[TEST] Stopping echo server.");
             await server.StopAsync().ConfigureAwait(false);
-            this.logger.Debug("[TEST] Echo server stopped.");
-            this.logger.Debug("[TEST] Disconnecting clients.");
+            TestContext.Out.WriteLine("[TEST] Echo server stopped.");
+            TestContext.Out.WriteLine("[TEST] Disconnecting clients.");
             await messageSender.CloseAsync().ConfigureAwait(false);
-            this.logger.Debug("[TEST] Disposing server.");
+            TestContext.Out.WriteLine("[TEST] Disposing server.");
             server.Dispose();
 
-            this.logger.Debug("[TEST] Waiting for send/receive completion.");
+            TestContext.Out.WriteLine("[TEST] Waiting for send/receive completion.");
         }
     }
 }

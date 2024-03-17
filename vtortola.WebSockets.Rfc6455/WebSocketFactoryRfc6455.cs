@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using vtortola.WebSockets.Transports;
+﻿using vtortola.WebSockets.Transports;
 
 namespace vtortola.WebSockets.Rfc6455
 {
@@ -8,7 +6,7 @@ namespace vtortola.WebSockets.Rfc6455
     {
         public override short Version => 13;
 
-        public override WebSocket CreateWebSocket(NetworkConnection networkConnection,  WebSocketListenerOptions options, WebSocketHttpRequest httpRequest, WebSocketHttpResponse httpResponse, List<IWebSocketMessageExtensionContext> negotiatedExtensions)
+        public override WebSocket CreateWebSocket(NetworkConnection networkConnection, WebSocketListenerOptions options, WebSocketHttpRequest httpRequest, WebSocketHttpResponse httpResponse, List<IWebSocketMessageExtensionContext> negotiatedExtensions)
         {
             if (networkConnection == null) throw new ArgumentNullException(nameof(networkConnection));
             if (options == null) throw new ArgumentNullException(nameof(options));

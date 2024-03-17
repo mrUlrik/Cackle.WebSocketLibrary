@@ -1,5 +1,4 @@
-﻿using System;
-using Options = System.Collections.ObjectModel.ReadOnlyCollection<vtortola.WebSockets.WebSocketExtensionOption>;
+﻿using Options = System.Collections.ObjectModel.ReadOnlyCollection<vtortola.WebSockets.WebSocketExtensionOption>;
 
 namespace vtortola.WebSockets.Deflate
 {

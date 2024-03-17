@@ -1,5 +1,4 @@
-﻿
-namespace vtortola.WebSockets
+﻿namespace vtortola.WebSockets
 {
     public enum WebSocketMessageType
     {

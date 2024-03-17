@@ -1,13 +1,11 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Threading;
 
 namespace vtortola.WebSockets.Async
 {
-    internal class CancellationQueue : NotificationQueue<CancellationTokenSource>
+    public class CancellationQueue : NotificationQueue<CancellationTokenSource>
     {
         public CancellationQueue(TimeSpan period)
             : base(period) { }

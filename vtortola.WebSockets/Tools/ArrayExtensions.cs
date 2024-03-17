@@ -1,5 +1,4 @@
-using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace vtortola.WebSockets.Tools
 {

@@ -1,8 +1,7 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
 
 namespace vtortola.WebSockets
 {

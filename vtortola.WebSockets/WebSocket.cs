@@ -1,7 +1,4 @@
-using System;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net;
 using JetBrains.Annotations;
 
 namespace vtortola.WebSockets

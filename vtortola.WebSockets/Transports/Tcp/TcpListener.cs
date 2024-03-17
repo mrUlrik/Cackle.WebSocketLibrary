@@ -1,13 +1,11 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-using System;
+
 using System.Net;
 using System.Net.Sockets;
 using vtortola.WebSockets.Transports.Sockets;
-
-#pragma warning disable 420
 
 namespace vtortola.WebSockets.Transports.Tcp
 {
@@ -36,11 +34,6 @@ namespace vtortola.WebSockets.Transports.Tcp
             socket.ReceiveTimeout = (int)this.transport.ReceiveTimeout.TotalMilliseconds + 1;
             socket.SendBufferSize = this.transport.SendBufferSize;
             socket.SendTimeout = (int)this.transport.SendTimeout.TotalMilliseconds + 1;
-#if !NETSTANDARD && !UAP
-            if (this.transport.IpProtectionLevel != IPProtectionLevel.Unspecified)
-                socket.SetIPProtectionLevel(this.transport.IpProtectionLevel);
-            socket.UseOnlyOverlappedIO = this.transport.IsAsync;
-#endif
             return new TcpConnection(socket, localEndPoint);
         }
 

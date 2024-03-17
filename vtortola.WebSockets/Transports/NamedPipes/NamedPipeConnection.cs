@@ -1,16 +1,13 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
-#if !NAMED_PIPES_DISABLE
-using System;
-using System.IO;
+
 using System.IO.Pipes;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 using vtortola.WebSockets.Tools;
 
+#if !NAMED_PIPES_DISABLE
 namespace vtortola.WebSockets.Transports.NamedPipes
 {
     internal class NamedPipeConnection : NetworkConnection

@@ -1,12 +1,4 @@
-﻿/*
-	Copyright (c) 2017 Denis Zykov
-	License: https://opensource.org/licenses/MIT
-*/
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Collections;
 using vtortola.WebSockets.Http;
 
 namespace vtortola.WebSockets
@@ -37,7 +29,7 @@ namespace vtortola.WebSockets
                 throw new WebSocketException($"Can't add {nameof(WebSocketFactory)} '{factory}' because another {nameof(WebSocketFactory)} with " +
                     $"version '{factory.Version}' is already exists in collection.");
             }
-            
+
             this.factoryByVersion.Add(factory.Version, factory);
         }
 
@@ -64,7 +56,6 @@ namespace vtortola.WebSockets
 
         internal void SetUsed(bool isUsed)
         {
-#pragma warning disable 420
             var newValue = default(int);
             if (isUsed)
                 newValue = Interlocked.Increment(ref this.useCounter);
@@ -72,7 +63,6 @@ namespace vtortola.WebSockets
                 newValue = Interlocked.Decrement(ref this.useCounter);
             if (newValue < 0)
                 throw new InvalidOperationException("The collection is released more than once.");
-#pragma warning restore 420
         }
 
         internal WebSocketFactory GetLast()
@@ -90,6 +80,6 @@ namespace vtortola.WebSockets
                 return true;
             else
                 return false;
-        }        
+        }
     }
 }

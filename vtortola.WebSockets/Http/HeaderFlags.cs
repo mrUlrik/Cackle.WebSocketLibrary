@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace vtortola.WebSockets.Http
+﻿namespace vtortola.WebSockets.Http
 {
     [Flags]
     public enum HeaderFlags

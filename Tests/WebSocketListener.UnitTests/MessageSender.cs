@@ -1,9 +1,6 @@
-using System;
+﻿using NUnit.Framework.Internal;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Net.WebSockets;
 using vtortola.WebSockets.Tools;
 
 namespace vtortola.WebSockets.UnitTests

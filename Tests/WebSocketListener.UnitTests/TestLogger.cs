@@ -1,11 +1,9 @@
-﻿using System;
-using Xunit.Abstractions;
+﻿using NUnit.Framework.Internal;
 
 namespace vtortola.WebSockets.UnitTests
 {
     public class TestLogger : ILogger
     {
-        private readonly ITestOutputHelper output;
         /// <inheritdoc />
         public bool IsDebugEnabled { get; set; }
         /// <inheritdoc />
@@ -13,20 +11,12 @@ namespace vtortola.WebSockets.UnitTests
         /// <inheritdoc />
         public bool IsErrorEnabled { get; set; }
 
-        public TestLogger(TestLogger other)
-            : this(other.output)
+        public TestLogger()
         {
-            if (other == null) throw new ArgumentNullException(nameof(other));
-        }
-        public TestLogger(ITestOutputHelper output)
-        {
-            if (output == null) throw new ArgumentNullException(nameof(output));
 
             this.IsDebugEnabled = true;
             this.IsWarningEnabled = true;
             this.IsErrorEnabled = true;
-
-            this.output = output;
         }
 
         /// <inheritdoc />
@@ -65,7 +55,7 @@ namespace vtortola.WebSockets.UnitTests
         }
         private void WriteLine(string message)
         {
-            this.output.WriteLine(message);
+            TestContext.Out.WriteLine(message);
             System.Diagnostics.Debug.WriteLine(message);
         }
     }

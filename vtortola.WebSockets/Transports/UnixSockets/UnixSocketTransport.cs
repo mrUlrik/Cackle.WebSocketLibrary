@@ -1,17 +1,13 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 ы	License: https://opensource.org/licenses/MIT
 */
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+
 using System.Linq.Expressions;
-using System.Net;
 using System.Net.Sockets;
+using System.Net.WebSockets;
+using System.Net;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using vtortola.WebSockets.Tools;
 using vtortola.WebSockets.Transports.Sockets;
 
@@ -126,9 +122,6 @@ namespace vtortola.WebSockets.Transports.UnixSockets
             socket.ReceiveTimeout = (int)this.ReceiveTimeout.TotalMilliseconds + 1;
             socket.SendBufferSize = this.SendBufferSize;
             socket.SendTimeout = (int)this.SendTimeout.TotalMilliseconds + 1;
-#if !NETSTANDARD && !UAP
-            socket.UseOnlyOverlappedIO = this.IsAsync;
-#endif
         }
 
         internal static string GetEndPointFileName(EndPoint unixEndPoint)

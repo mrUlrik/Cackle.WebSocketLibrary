@@ -1,20 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Net.WebSockets;
 using System.Net;
 using System.Runtime.ExceptionServices;
 using System.Text;
-using System.Threading.Tasks;
 using vtortola.WebSockets.Extensibility;
 using vtortola.WebSockets.Http;
 using vtortola.WebSockets.Tools;
 using vtortola.WebSockets.Transports;
-using static vtortola.WebSockets.Async.AsyncConditionSource;
 
 namespace vtortola.WebSockets
 {
-    internal class WebSocketHandshaker
+    public class WebSocketHandshaker
     {
         private static readonly Version HttpVersion11 = new Version(1, 1);
         private static readonly Version HttpVersion10 = new Version(1, 0);

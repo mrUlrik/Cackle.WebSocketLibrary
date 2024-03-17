@@ -1,13 +1,10 @@
-/*
+﻿/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
 
-using System;
-using System.IO;
-using System.Net;
 using System.Net.Sockets;
-using System.Threading;
+using System.Net;
 using vtortola.WebSockets.Transports.Sockets;
 
 namespace vtortola.WebSockets.Transports.UnixSockets
@@ -32,9 +29,6 @@ namespace vtortola.WebSockets.Transports.UnixSockets
             socket.ReceiveTimeout = (int)this.transport.ReceiveTimeout.TotalMilliseconds + 1;
             socket.SendBufferSize = this.transport.SendBufferSize;
             socket.SendTimeout = (int)this.transport.SendTimeout.TotalMilliseconds + 1;
-#if !NETSTANDARD && !UAP
-            socket.UseOnlyOverlappedIO = this.transport.IsAsync;
-#endif
             return new UnixSocketConnection(socket, localEndPoint);
         }
 

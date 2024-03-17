@@ -1,6 +1,4 @@
-using System;
-
-namespace vtortola.WebSockets.Rfc6455.Header
+﻿namespace vtortola.WebSockets.Rfc6455.Header
 {
     public static class EndianBitConverter
     {
