@@ -133,15 +133,9 @@ UNIX Domain Sockets are tested on Linux</PackageReleaseNotes>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\vtortola.WebSockets.Deflate\vtortola.WebSockets.Deflate.csproj">
-        <PrivateAssets>All</PrivateAssets>
-    </ProjectReference>
-    <ProjectReference Include="..\vtortola.WebSockets.Rfc6455\vtortola.WebSockets.Rfc6455.csproj">
-        <PrivateAssets>All</PrivateAssets>
-    </ProjectReference>
-    <ProjectReference Include="..\vtortola.WebSockets\vtortola.WebSockets.csproj">
-        <PrivateAssets>All</PrivateAssets>
-    </ProjectReference>
+    <ProjectReference Include="..\vtortola.WebSockets.Deflate\vtortola.WebSockets.Deflate.csproj"/>
+    <ProjectReference Include="..\vtortola.WebSockets.Rfc6455\vtortola.WebSockets.Rfc6455.csproj"/>
+    <ProjectReference Include="..\vtortola.WebSockets\vtortola.WebSockets.csproj"/>
   </ItemGroup>
 
 </Project>
