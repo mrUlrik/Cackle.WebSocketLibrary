@@ -69,14 +69,19 @@ namespace vtortola.WebSockets.UnitTests
                     await TestContext.Out.WriteLineAsync("[CLIENT] -> " + message);
                     await Task.Delay(100, cancellation).ConfigureAwait(false);
                 }
-
-                // The server sends "Request served by <identifier>" upon connection. Receive first line.
-                await webSocket.ReadStringAsync(cancellation).ConfigureAwait(false);
+                
 
                 foreach (var expectedMessage in messages)
                 {
                     var actualMessage = await webSocket.ReadStringAsync(cancellation).ConfigureAwait(false);
                     if (actualMessage == null && !webSocket.IsConnected) throw new InvalidOperationException("Connection is closed!");
+
+                    // The server sends "Request served by <identifier>" upon connection. Receive first line.
+                    if (actualMessage is null || actualMessage.StartsWith("Request served by"))
+                    {
+                        actualMessage = await webSocket.ReadStringAsync(cancellation).ConfigureAwait(false);
+                        if (actualMessage == null && !webSocket.IsConnected) throw new InvalidOperationException("Connection is closed!");
+                    }
 
                     await TestContext.Out.WriteLineAsync("[CLIENT] <- " + (actualMessage ?? "<null>"));
                     Assert.NotNull(actualMessage);

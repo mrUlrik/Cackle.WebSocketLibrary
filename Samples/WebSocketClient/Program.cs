@@ -1,4 +1,4 @@
-﻿using EchoServer;
+using EchoServer;
 using Serilog;
 using vtortola.WebSockets;
 using vtortola.WebSockets.Rfc6455;
@@ -38,7 +38,7 @@ options.Transports.ConfigureTcp(tcp =>
 });
 
 var message = "Hello!";
-var echoServerUrl = new Uri("ws://echo.websocket.org?encoding=text");
+var echoServerUrl = new Uri("wss://echo.websocket.org?encoding=text");
 var client = new vtortola.WebSockets.WebSocketClient(options);
 
 Log.Warning("Connecting to " + echoServerUrl + "...");
