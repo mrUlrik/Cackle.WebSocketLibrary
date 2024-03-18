@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -129,13 +129,13 @@ UNIX Domain Sockets are tested on Linux</PackageReleaseNotes>
 
   <ItemGroup>
     <ProjectReference Include="..\vtortola.WebSockets.Deflate\vtortola.WebSockets.Deflate.csproj">
-	    <PrivateAssets>All</PrivateAssets>
-	</ProjectReference>
+        <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
     <ProjectReference Include="..\vtortola.WebSockets.Rfc6455\vtortola.WebSockets.Rfc6455.csproj">
-		<PrivateAssets>All</PrivateAssets>
+        <PrivateAssets>All</PrivateAssets>
     </ProjectReference>
     <ProjectReference Include="..\vtortola.WebSockets\vtortola.WebSockets.csproj">
-		<PrivateAssets>All</PrivateAssets>
+        <PrivateAssets>All</PrivateAssets>
     </ProjectReference>
   </ItemGroup>
 

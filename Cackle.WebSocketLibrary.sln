@@ -13,15 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cackle.WebSocketLibrary", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E7732A22-2FD5-4A1C-8D7B-67669FEAD95A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vtortola.WebSockets.UnitTests", "vtortola.WebSockets.UnitTests\vtortola.WebSockets.UnitTests.csproj", "{5E5F0E46-FB8C-447B-BAD3-6A35D47F2B3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vtortola.WebSockets.UnitTests", "Tests\WebSocketListener.UnitTests\vtortola.WebSockets.UnitTests.csproj", "{5E5F0E46-FB8C-447B-BAD3-6A35D47F2B3C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{135B5D6F-A706-4CCC-BC97-99C9BD6F8B9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoServer", "EchoServer\EchoServer.csproj", "{84EDFC71-62E8-4DFB-9C70-7E54BDE6F7DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoServer", "Samples\EchoServer\EchoServer.csproj", "{84EDFC71-62E8-4DFB-9C70-7E54BDE6F7DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoEchoServer", "MonoEchoServer\MonoEchoServer.csproj", "{4083008E-CB1C-45E2-984C-2D53B0336E36}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoEchoServer", "Samples\MonoEchoServer\MonoEchoServer.csproj", "{4083008E-CB1C-45E2-984C-2D53B0336E36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketClient", "WebSocketClient\WebSocketClient.csproj", "{2F61D178-538F-47CF-B157-370226BD1FED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketClient", "Samples\WebSocketClient\WebSocketClient.csproj", "{2F61D178-538F-47CF-B157-370226BD1FED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

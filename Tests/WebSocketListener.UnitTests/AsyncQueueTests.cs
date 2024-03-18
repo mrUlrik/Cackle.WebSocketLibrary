@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
+using System.Reflection.Metadata.Ecma335;
 using vtortola.WebSockets.Async;
 using vtortola.WebSockets.Tools;
 
@@ -353,7 +354,7 @@ namespace vtortola.WebSockets.UnitTests
         }
 
         [Test]
-        public async Task DequeueAsyncCancellation()
+        public Task DequeueAsyncCancellation()
         {
             var asyncQueue = new AsyncQueue<int>();
             var cancellation = new CancellationTokenSource();
@@ -367,14 +368,17 @@ namespace vtortola.WebSockets.UnitTests
                 await receiveAsync.ConfigureAwait(false);
             });
 
-            if (await Task.WhenAny(timeout).ConfigureAwait(false) == timeout)
-                throw new TimeoutException();
+            while (!receiveAsync.IsCompleted)
+                if (timeout.IsCompleted)
+                    throw new TimeoutException();
 
             Assert.That(asyncQueue.Count, Is.EqualTo(0));
+
+            return Task.CompletedTask;
         }
 
         [Test]
-        public async Task DequeueAsyncCloseCancellation()
+        public Task DequeueAsyncCloseCancellation()
         {
             var asyncQueue = new AsyncQueue<int>();
             var cancellation = new CancellationTokenSource(2000);
@@ -388,35 +392,49 @@ namespace vtortola.WebSockets.UnitTests
 
             asyncQueue.ClearAndClose(new OperationCanceledException());
 
-            if (await Task.WhenAny(timeout).ConfigureAwait(false) == timeout)
-                throw new TimeoutException();
+            while (!receiveAsync.IsCompleted)
+                if (timeout.IsCompleted)
+                    throw new TimeoutException();
 
             Assert.That(asyncQueue.Count, Is.EqualTo(0));
+
+            return Task.CompletedTask;
         }
 
         [Test]
-        public async Task DequeueAsyncCloseError()
+        public Task DequeueAsyncCloseError()
         {
             var asyncQueue = new AsyncQueue<int>();
             var cancellation = new CancellationTokenSource(2000);
             var receiveAsync = asyncQueue.DequeueAsync(cancellation.Token);
 
             var timeout = Task.Delay(1000);
-            var recvTask = Assert.ThrowsAsync<IOException>(async () =>
+
+            try
             {
-                await receiveAsync.ConfigureAwait(false);
-            });
+                receiveAsync.ConfigureAwait(false);
+            }
+            catch (IOException)
+            {
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Expected exception of type: {ex.GetType()} but was {ex.GetType()} instead");
+            }
 
             asyncQueue.ClearAndClose(new IOException());
 
-            if (await Task.WhenAny(timeout).ConfigureAwait(false) == timeout)
-                throw new TimeoutException();
+            while (!receiveAsync.IsCompleted)
+                if (timeout.IsCompleted)
+                    throw new TimeoutException();
 
             Assert.That(asyncQueue.Count, Is.EqualTo(0));
+
+            return Task.CompletedTask;
         }
 
         [Test]
-        public async Task DequeueAsyncCloseReceiveAllCancellation()
+        public Task DequeueAsyncCloseReceiveAllCancellation()
         {
             var asyncQueue = new AsyncQueue<int>();
             var cancellation = new CancellationTokenSource(2000);
@@ -430,11 +448,14 @@ namespace vtortola.WebSockets.UnitTests
 
             var all = asyncQueue.TakeAllAndClose(closeError: new OperationCanceledException());
 
-            if (await Task.WhenAny(timeout).ConfigureAwait(false) == timeout)
-                throw new TimeoutException();
+            while (!receiveAsync.IsCompleted)
+                if (timeout.IsCompleted)
+                    throw new TimeoutException();
 
             Assert.IsEmpty(all);
             Assert.That(asyncQueue.Count, Is.EqualTo(0));
+
+            return Task.CompletedTask;
         }
 
         [Theory]

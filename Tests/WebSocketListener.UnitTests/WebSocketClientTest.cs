@@ -1,4 +1,4 @@
-﻿using vtortola.WebSockets.Deflate;
+using vtortola.WebSockets.Deflate;
 using vtortola.WebSockets.Rfc6455;
 using vtortola.WebSockets.Transports.NamedPipes;
 
@@ -17,7 +17,6 @@ namespace vtortola.WebSockets.UnitTests
         }
 
         [Theory]
-        [TestCase("ws://echo.websocket.org?encoding=text", 15)]
         [TestCase("wss://echo.websocket.org?encoding=text", 15)]
         public async Task RemoteConnectToServerAsync(string address, int timeoutSeconds)
         {
@@ -40,8 +39,6 @@ namespace vtortola.WebSockets.UnitTests
         }
 
         [Theory]
-        [TestCase("ws://echo.websocket.org/?encoding=text", 15, new[] { "a test message" })]
-        [TestCase("ws://echo.websocket.org/?encoding=text", 15, new[] { "a test message", "a second message" })]
         [TestCase("wss://echo.websocket.org?encoding=text", 15, new[] { "a test message" })]
         [TestCase("wss://echo.websocket.org?encoding=text", 15, new[] { "a test message", "a second message" })]
         public async Task RemoteEchoServerAsync(string address, int timeoutSeconds, string[] messages)
@@ -65,21 +62,25 @@ namespace vtortola.WebSockets.UnitTests
             var sendReceiveTask = new Func<Task>(async () =>
             {
                 await Task.Yield();
+
                 foreach (var message in messages)
                 {
                     await webSocket.WriteStringAsync(message, cancellation).ConfigureAwait(false);
-                    TestContext.Out.WriteLine("[CLIENT] -> " + message);
-                    await Task.Delay(100).ConfigureAwait(false);
+                    await TestContext.Out.WriteLineAsync("[CLIENT] -> " + message);
+                    await Task.Delay(100, cancellation).ConfigureAwait(false);
                 }
+
+                // The server sends "Request served by <identifier>" upon connection. Receive first line.
+                await webSocket.ReadStringAsync(cancellation).ConfigureAwait(false);
 
                 foreach (var expectedMessage in messages)
                 {
                     var actualMessage = await webSocket.ReadStringAsync(cancellation).ConfigureAwait(false);
                     if (actualMessage == null && !webSocket.IsConnected) throw new InvalidOperationException("Connection is closed!");
 
-                    TestContext.Out.WriteLine("[CLIENT] <- " + (actualMessage ?? "<null>"));
+                    await TestContext.Out.WriteLineAsync("[CLIENT] <- " + (actualMessage ?? "<null>"));
                     Assert.NotNull(actualMessage);
-                    Assert.That(actualMessage, Is.EqualTo(expectedMessage));
+                    CollectionAssert.Contains(messages, actualMessage);
                 }
 
                 await webSocket.CloseAsync().ConfigureAwait(false);

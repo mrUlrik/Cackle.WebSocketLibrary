@@ -1,4 +1,4 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using vtortola.WebSockets.Http;
 
 namespace vtortola.WebSockets.UnitTests
@@ -202,8 +202,8 @@ namespace vtortola.WebSockets.UnitTests
                 "via", "trailer", "value1", "value2"
             };
 
-            Assert.That(expectedKeys, Has.All.Contains(allKeys));
-            Assert.That(expectedValues, Has.All.Contains(allValues));
+            CollectionAssert.AreEquivalent(expectedKeys, allKeys);
+            CollectionAssert.AreEquivalent(expectedValues, allValues);
         }
 
         [Test]

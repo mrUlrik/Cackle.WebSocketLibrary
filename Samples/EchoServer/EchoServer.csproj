@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,9 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\vtortola.WebSockets.Deflate\vtortola.WebSockets.Deflate.csproj" />
-    <ProjectReference Include="..\vtortola.WebSockets.Rfc6455\vtortola.WebSockets.Rfc6455.csproj" />
-    <ProjectReference Include="..\vtortola.WebSockets\vtortola.WebSockets.csproj" />
+    <ProjectReference Include="..\..\vtortola.WebSockets.Deflate\vtortola.WebSockets.Deflate.csproj" />
+    <ProjectReference Include="..\..\vtortola.WebSockets.Rfc6455\vtortola.WebSockets.Rfc6455.csproj" />
+    <ProjectReference Include="..\..\vtortola.WebSockets\vtortola.WebSockets.csproj" />
   </ItemGroup>
 
 </Project>

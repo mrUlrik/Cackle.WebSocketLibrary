@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
@@ -269,6 +269,8 @@ namespace vtortola.WebSockets
                     else
                         throw new WebSocketException($"Invalid handshake response: {responseLine}.");
                 }
+
+                //if (handshake.Response.Status == HttpStatusCode.MovedPermanently)
 
                 if (handshake.Response.Status != HttpStatusCode.SwitchingProtocols)
                     throw new WebSocketException($"Invalid handshake response: {responseLine}.");
