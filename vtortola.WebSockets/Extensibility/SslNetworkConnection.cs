@@ -1,5 +1,5 @@
-﻿using System.Net.Security;
 using System.Net;
+using System.Net.Security;
 using JetBrains.Annotations;
 using vtortola.WebSockets.Transports;
 

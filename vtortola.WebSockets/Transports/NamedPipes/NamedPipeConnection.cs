@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
@@ -7,7 +7,6 @@ using System.IO.Pipes;
 using System.Net;
 using vtortola.WebSockets.Tools;
 
-#if !NAMED_PIPES_DISABLE
 namespace vtortola.WebSockets.Transports.NamedPipes
 {
     internal class NamedPipeConnection : NetworkConnection
@@ -97,4 +96,3 @@ namespace vtortola.WebSockets.Transports.NamedPipes
         }
     }
 }
-#endif

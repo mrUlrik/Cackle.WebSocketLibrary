@@ -1,4 +1,3 @@
-﻿using System.Net.WebSockets;
 using vtortola.WebSockets.Rfc6455.Header;
 
 namespace vtortola.WebSockets.Rfc6455

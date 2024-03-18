@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
@@ -6,7 +6,6 @@
 using System.Net;
 using System.Text;
 
-#if !NAMED_PIPES_DISABLE
 namespace vtortola.WebSockets.Transports.NamedPipes
 {
     internal class NamedPipeEndPoint : EndPoint
@@ -37,4 +36,3 @@ namespace vtortola.WebSockets.Transports.NamedPipes
         }
     }
 }
-#endif

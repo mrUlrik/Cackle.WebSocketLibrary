@@ -1,4 +1,3 @@
-﻿using System.Net.WebSockets;
 using System.Runtime.ExceptionServices;
 using vtortola.WebSockets.Async;
 using vtortola.WebSockets.Tools;

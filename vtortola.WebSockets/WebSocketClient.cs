@@ -5,7 +5,6 @@
 
 using System.Collections.Concurrent;
 using System.Net.Security;
-using System.Net.WebSockets;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;

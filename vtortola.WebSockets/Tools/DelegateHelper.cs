@@ -1,9 +1,8 @@
-﻿/*
+/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
 
-using System.Reflection;
 using System.Security;
 
 namespace vtortola.WebSockets.Tools

@@ -1,4 +1,3 @@
-﻿using System.Net.WebSockets;
 using System.Net;
 using vtortola.WebSockets.Http;
 

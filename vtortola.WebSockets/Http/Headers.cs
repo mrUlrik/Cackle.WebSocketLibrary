@@ -1,10 +1,10 @@
-﻿/*
+/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
 
-using System.Collections.Specialized;
 using System.Collections;
+using System.Collections.Specialized;
 using System.Reflection;
 using vtortola.WebSockets.Tools;
 

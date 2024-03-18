@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
@@ -47,7 +47,7 @@ namespace vtortola.WebSockets.Transports
                 configure?.Invoke(tcpTransport);
             return this;
         }
-#if !NAMED_PIPES_DISABLE
+
         public WebSocketTransportCollection RegisterNamedPipes(Action<NamedPipeTransport> configure = null)
         {
             var transport = new NamedPipeTransport();
@@ -55,7 +55,7 @@ namespace vtortola.WebSockets.Transports
             this.Add(transport);
             return this;
         }
-#endif
+
         public WebSocketTransportCollection RegisterUnixSockets(Action<UnixSocketTransport> configure = null)
         {
             var transport = new UnixSocketTransport();

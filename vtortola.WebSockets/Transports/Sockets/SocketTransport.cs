@@ -1,11 +1,10 @@
-﻿/*
+/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
 
-using System.Net.Sockets;
-using System.Net.WebSockets;
 using System.Net;
+using System.Net.Sockets;
 using vtortola.WebSockets.Async;
 using vtortola.WebSockets.Transports.UnixSockets;
 

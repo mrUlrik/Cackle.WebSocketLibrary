@@ -1,13 +1,12 @@
-﻿/*
+/*
 	Copyright (c) 2017 Denis Zykov
 	License: https://opensource.org/licenses/MIT
 */
 
 using System.IO.Pipes;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 
-#if !NAMED_PIPES_DISABLE
 namespace vtortola.WebSockets.Transports.NamedPipes
 {
     internal sealed class NamedPipeListener : Listener
@@ -113,4 +112,3 @@ namespace vtortola.WebSockets.Transports.NamedPipes
         }
     }
 }
-#endif

@@ -1,5 +1,3 @@
-﻿using System.Net.WebSockets;
-
 namespace vtortola.WebSockets
 {
     public sealed class WebSocketMessageExtensionCollection : IReadOnlyCollection<IWebSocketMessageExtension>

@@ -1,12 +1,11 @@
-﻿/*
+/*
 	Copyright (c) 2017 Denis Zykov
 ы	License: https://opensource.org/licenses/MIT
 */
 
 using System.Linq.Expressions;
-using System.Net.Sockets;
-using System.Net.WebSockets;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using vtortola.WebSockets.Tools;
 using vtortola.WebSockets.Transports.Sockets;
