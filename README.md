@@ -5,7 +5,7 @@ WebSocketListener
 
 The **WebSocketListener** class provides simple methods that listen for and accept incoming WebSocket connection requests asynchronously. It is a lightweight listener with an API very similar to the `System.Net.TcpListener` class.
 
-It **does not use** the Microsoft's `System.Net.WebSockets` namespace. It should work in any operating system running *.NET 8.0*. This class is perfect for creating endpoints with **WebSockets** in **Windows 10**, which are not supported by `System.Net.WebSockets`. Also works on **Linux** through **Mono**.
+It **does not use** the Microsoft's `System.Net.WebSockets` namespace. It has been reworked to use *.NET 8.0* and should work on any operating system with .NET 8.0 support.
 
 **WebSocketListener** has been designed to provide WebSocket connectivity to other applications, in the same way that `System.Net.TcpListener` provides TCP connectivity. It is not a communication framework on its own and it does not provide any kind of publisher/subscriber pattern or reliable messaging beyond TCP.
 
@@ -66,6 +66,7 @@ Lost Features:
 Known Problems:
 - WebSocketDeflateStream uses sync Stream methods, it should be rewritten to fully support async operations.
 - Mono can't handle IPv6 Dual Mode sockets properly (exception in Socket.RemoteEndPoint and Socket.LocalEndPoint).
+- Will not renegotiate with a WebSocket server that redirects to WSS, instead it throws an error.
 
 ### Quickstart
 
