@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using NUnit.Framework.Internal;
+﻿using NUnit.Framework.Internal;
 using System.Text;
 using Moq;
 using vtortola.WebSockets.Http;
