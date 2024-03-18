@@ -270,7 +270,7 @@ namespace vtortola.WebSockets
                         throw new WebSocketException($"Invalid handshake response: {responseLine}.");
                 }
 
-                if (handshake.Response.Status == HttpStatusCode.MovedPermanently || !handshake.Request.IsSecure)
+                if (handshake.Response.Status == HttpStatusCode.MovedPermanently && !handshake.Request.IsSecure)
                     throw new WebSocketException($"Invalid handshake response. Remote host requires a secure connection.");
 
                 if (handshake.Response.Status != HttpStatusCode.SwitchingProtocols)
